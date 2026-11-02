@@ -1,0 +1,43 @@
+{% extends "panel/_base.html" %}{% load fa %}
+{% block page_title %}خرید اشتراک{% endblock %}{% block page_title_text %}اشتراک{% endblock %}
+{% block content %}
+<div class="alert {% if shop.has_subscription %}alert-success{% else %}alert-error{% endif %}">
+  <svg class="i"><use href="#i-calendar"/></svg>
+  <div>{% if shop.has_subscription %}اشتراک فعال تا <b>{{ shop.subscription_until|jdate:"long" }}</b> ({{ shop.days_left|fa }} روز). خرید جدید به انتهای همین تاریخ اضافه می‌شود.{% else %}اشتراکی ندارید؛ صفحه فروشگاه برای مشتریان نمایش داده نمی‌شود.{% endif %}</div>
+</div>
+{% if JIBIT_MOCK %}<div class="alert alert-warning"><svg class="i"><use href="#i-alert"/></svg><div>درگاه در حالت آزمایشی است (کلید جیبیت تنظیم نشده).</div></div>{% endif %}
+
+<div class="plans" style="margin:26px 0">
+  {% for plan in plans %}
+  <div class="plan{% if plan.is_popular %} popular{% endif %}">
+    {% if plan.is_popular %}<span class="tag">پیشنهاد ما</span>{% endif %}
+    <h3>{{ plan.name }}</h3>
+    <div class="muted small">{{ plan.days|fa }} روز</div>
+    <div class="price">{{ plan.price_toman|money }} <small>تومان</small></div>
+    <div class="desc">{{ plan.description }}</div>
+    <form method="post" action="{% url 'panel:buy' plan.pk %}">{% csrf_token %}
+      <button class="btn btn-block{% if not plan.is_popular %} btn-soft{% endif %}" type="submit"><svg class="i"><use href="#i-card"/></svg>پرداخت با جیبیت</button>
+    </form>
+  </div>
+  {% empty %}
+  <div class="card empty">فعلاً پلنی برای خرید تعریف نشده است.</div>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <div class="card-head"><h3>تاریخچه پرداخت‌ها</h3></div>
+  {% if payments %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th>تاریخ</th><th>پلن</th><th>مبلغ (تومان)</th><th>وضعیت</th><th>کد پیگیری</th></tr></thead>
+    <tbody>{% for p in payments %}
+      <tr>
+        <td>{{ p.created_at|jdate:"time" }}</td>
+        <td>{{ p.plan.name|default:p.get_gateway_display }} <span class="muted small">({{ p.days|fa }} روز)</span></td>
+        <td>{{ p.amount_toman|money }}</td>
+        <td>{% if p.status == "success" %}<span class="badge badge-success">موفق</span>{% elif p.status == "failed" %}<span class="badge badge-danger">ناموفق</span>{% else %}<span class="badge badge-warning">در انتظار</span>{% endif %}</td>
+        <td class="ltr small">{{ p.psp_ref|default:"—" }}</td>
+      </tr>{% endfor %}
+    </tbody></table></div>
+  {% else %}<div class="empty">پرداختی ثبت نشده است.</div>{% endif %}
+</div>
+{% endblock %}

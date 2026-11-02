@@ -1,0 +1,14 @@
+<button type="button" class="product{% if not p.is_available %} unavailable{% endif %}"
+  data-name="{{ p.name }}" data-brand="{{ p.brand }}" data-desc="{{ p.description }}" data-cat="{{ p.category.name|default:'' }}"
+  data-available="{{ p.is_available|yesno:'1,0' }}" data-img="{% if p.image %}{{ p.image.url }}{% endif %}">
+  <div class="img">
+    {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.name }}" loading="lazy">{% else %}<div class="ph"><svg class="i"><use href="#pi-{{ p.category.icon|default:'paw' }}"/></svg></div>{% endif %}
+    <div class="badges">
+      {% if not p.is_available %}<span class="badge badge-danger">ناموجود</span>{% endif %}
+    </div>
+  </div>
+  <div class="p-body">
+    <h3>{{ p.name }}</h3>
+    {% if p.brand %}<div class="brand-name">{{ p.brand }}</div>{% endif %}
+  </div>
+</button>

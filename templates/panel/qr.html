@@ -1,0 +1,28 @@
+{% extends "panel/_base.html" %}
+{% block page_title %}QR کد فروشگاه{% endblock %}{% block page_title_text %}QR کد{% endblock %}
+{% block content %}
+<div class="grid-2">
+  <div class="card card-body">
+    <div class="qr-show">
+      <img src="{% url 'shop_qr' shop.slug %}" alt="QR {{ shop.name }}">
+      <div style="flex:1;min-width:240px">
+        <h2 style="font-size:19px">QR کد اختصاصی {{ shop.name }}</h2>
+        <p class="muted">این کد را روی ویترین، پیشخوان یا کارت ویزیت بگذارید. مشتری با اسکن آن مستقیم به کاتالوگ محصولات شما می‌رسد.</p>
+        <div class="copy-box" style="margin-bottom:14px"><input class="input" id="shop-url" value="{{ shop.public_url }}" readonly><button class="btn btn-soft" type="button" data-copy="shop-url"><svg class="i i-sm"><use href="#i-copy"/></svg>کپی</button></div>
+        <div class="row">
+          <a class="btn" href="{% url 'shop_qr' shop.slug %}?size=large&download=1"><svg class="i"><use href="#i-download"/></svg>دانلود PNG با کیفیت بالا</a>
+          <a class="btn btn-ghost" href="{% url 'shop_qr_print' shop.slug %}" target="_blank"><svg class="i"><use href="#i-print"/></svg>نسخه چاپی برای کارت کوچک</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <form method="post" class="card card-body">
+    {% csrf_token %}
+    {% include "partials/form_errors.html" %}
+    <h3 style="font-size:16px;margin-top:0">متن زیر QR روی کارت چاپی</h3>
+    <p class="muted small">همین متن زیر QR در نسخهٔ چاپی (مناسب چاپ روی کارت کوچک) نشان داده می‌شود.</p>
+    {% include "partials/field.html" with field=form.qr_caption %}
+    <button class="btn btn-block" type="submit"><svg class="i"><use href="#i-check"/></svg>ذخیره متن</button>
+  </form>
+</div>
+{% endblock %}

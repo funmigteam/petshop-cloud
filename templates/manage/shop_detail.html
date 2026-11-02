@@ -1,0 +1,114 @@
+{% extends "manage/_base.html" %}{% load fa %}
+{% block page_title %}{{ shop.name }}{% endblock %}{% block page_title_text %}{{ shop.name }}{% endblock %}
+{% block actions %}
+<a class="btn btn-ghost" href="{{ shop.get_absolute_url }}" target="_blank"><svg class="i"><use href="#i-eye"/></svg>صفحه عمومی</a>
+<a class="btn btn-ghost" href="{% url 'manage:shop_edit' shop.pk %}"><svg class="i"><use href="#i-edit"/></svg>ویرایش</a>
+<a class="btn" href="{% url 'manage:shop_enter' shop.pk %}"><svg class="i"><use href="#i-store"/></svg>ورود به پنل</a>
+{% endblock %}
+{% block content %}
+{% if creds %}
+<div class="creds">
+  <h3 style="font-size:16px;display:flex;gap:8px;align-items:center"><svg class="i" style="color:var(--success)"><use href="#i-check"/></svg>اطلاعات ورود را به مدیر پت شاپ بدهید</h3>
+  <p class="small">این رمز فقط همین یک بار نمایش داده می‌شود.</p>
+  <dl class="kv"><dt>نام کاربری</dt><dd><code class="ltr">{{ creds.username }}</code></dd><dt>رمز عبور</dt><dd><code class="ltr">{{ creds.password }}</code></dd><dt>صفحه ورود</dt><dd class="ltr">{{ SITE_URL }}{% url 'login' %}</dd></dl>
+</div>
+{% endif %}
+
+<div class="grid-2">
+  <div class="stack">
+    <div class="card">
+      <div class="card-head"><svg class="i"><use href="#i-link"/></svg><h3>لینک اختصاصی پنل مدیریت</h3></div>
+      <div class="card-body">
+        <p class="muted small">با باز کردن این لینک، مدیر پت شاپ بدون رمز وارد پنل خودش می‌شود. آن را فقط به خود مالک بدهید.</p>
+        <div class="copy-box"><input class="input" id="panel-link" value="{{ shop.panel_link }}" readonly><button class="btn btn-soft" type="button" data-copy="panel-link"><svg class="i i-sm"><use href="#i-copy"/></svg>کپی</button></div>
+        <form method="post" action="{% url 'manage:shop_token' shop.pk %}" style="margin-top:12px" data-confirm="لینک فعلی باطل و لینک جدید ساخته شود؟">{% csrf_token %}
+          <button class="btn btn-ghost btn-sm"><svg class="i i-sm"><use href="#i-refresh"/></svg>ساخت لینک جدید (باطل کردن قبلی)</button></form>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><svg class="i"><use href="#i-globe"/></svg><h3>صفحه عمومی و QR</h3></div>
+      <div class="card-body">
+        <div class="qr-show">
+          <img src="{% url 'shop_qr' shop.slug %}" alt="QR" style="width:180px;height:180px">
+          <div style="flex:1;min-width:220px">
+            <div class="copy-box" style="margin-bottom:12px"><input class="input" id="public-url" value="{{ shop.public_url }}" readonly><button class="btn btn-soft" type="button" data-copy="public-url"><svg class="i i-sm"><use href="#i-copy"/></svg></button></div>
+            <a class="btn btn-sm" href="{% url 'shop_qr' shop.slug %}?size=large&download=1"><svg class="i i-sm"><use href="#i-download"/></svg>دانلود QR</a>
+            <a class="btn btn-ghost btn-sm" href="{% url 'shop_qr_print' shop.slug %}" target="_blank"><svg class="i i-sm"><use href="#i-print"/></svg>چاپ</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><svg class="i"><use href="#i-map"/></svg><h3>موقعیت روی نقشه</h3></div>
+      <div class="card-body">
+        {% if shop.has_location %}
+          <p class="small muted ltr" style="direction:ltr;text-align:left">{{ shop.lat }}, {{ shop.lng }}</p>
+        {% else %}
+          <p class="small muted">هنوز روی نقشه ثبت نشده است.</p>
+        {% endif %}
+        <a class="btn btn-soft btn-sm" href="{% url 'manage:shop_location' shop.pk %}"><svg class="i i-sm"><use href="#i-map"/></svg>{% if shop.has_location %}ویرایش موقعیت{% else %}ثبت روی نقشه{% endif %}</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>پرداخت‌ها و تمدیدها</h3></div>
+      {% if payments %}<div class="table-wrap"><table class="table">
+        <thead><tr><th>تاریخ</th><th>شرح</th><th>مبلغ (ریال)</th><th>وضعیت</th></tr></thead><tbody>
+        {% for p in payments %}<tr><td class="small">{{ p.created_at|jdate:"time" }}</td><td>{{ p.plan.name|default:p.message }} <span class="muted small">({{ p.days|fa }} روز)</span></td><td>{{ p.amount|money }}</td>
+          <td>{% if p.status == "success" %}<span class="badge badge-success">موفق</span>{% elif p.status == "failed" %}<span class="badge badge-danger">ناموفق</span>{% else %}<span class="badge badge-warning">در انتظار</span>{% endif %}</td></tr>{% endfor %}
+      </tbody></table></div>{% else %}<div class="empty small">پرداختی ندارد.</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="card card-body">
+      <div class="row" style="margin-bottom:14px">{% include "partials/shop_logo.html" with cls="thumb" %}<div><b>{{ shop.name }}</b><div>{% include "manage/_status.html" %}</div></div></div>
+      <dl class="kv">
+        <dt>مالک</dt><dd class="ltr" style="text-align:right">{{ shop.owner.username }}</dd>
+        <dt>اعتبار تا</dt><dd>{{ shop.subscription_until|jdate:"long" }}</dd>
+        <dt>محصولات</dt><dd>{{ product_count|fa }}</dd>
+        <dt>بازدید</dt><dd>{{ shop.views|money }}</dd>
+        <dt>تلفن</dt><dd class="ltr" style="text-align:right">{{ shop.phone|default:"—" }}</dd>
+        <dt>ثبت</dt><dd>{{ shop.created_at|jdate:"long" }}</dd>
+      </dl>
+    </div>
+    <form method="post" action="{% url 'manage:shop_extend' shop.pk %}" class="card">
+      {% csrf_token %}
+      <div class="card-head"><svg class="i"><use href="#i-calendar"/></svg><h3>تمدید دستی اشتراک</h3></div>
+      <div class="card-body">
+        <div class="row" style="gap:6px;margin-bottom:12px">
+          <button type="button" class="chip" onclick="this.form.days.value=15">۱۵ روز</button>
+          <button type="button" class="chip" onclick="this.form.days.value=30">۱ ماه</button>
+          <button type="button" class="chip" onclick="this.form.days.value=90">۳ ماه</button>
+          <button type="button" class="chip" onclick="this.form.days.value=365">۱ سال</button>
+        </div>
+        {% include "partials/field.html" with field=extend_form.days %}
+        <button class="btn btn-block" type="submit">اعمال</button>
+      </div>
+    </form>
+    <div class="card card-body">
+      <form method="post" action="{% url 'manage:shop_toggle' shop.pk %}">{% csrf_token %}<input type="hidden" name="field" value="is_active">
+        <div class="field-check" style="margin-bottom:10px"><span>فروشگاه فعال است</span><input type="checkbox" class="switch" {% if shop.is_active %}checked{% endif %} onchange="this.form.submit()"></div></form>
+      <form method="post" action="{% url 'manage:shop_toggle' shop.pk %}">{% csrf_token %}<input type="hidden" name="field" value="is_featured">
+        <div class="field-check"><span>بنر ویژه در صفحه اصلی</span><input type="checkbox" class="switch" {% if shop.is_featured %}checked{% endif %} onchange="this.form.submit()"></div></form>
+    </div>
+    <form method="post" action="{% url 'manage:shop_password' shop.pk %}" class="card">
+      {% csrf_token %}
+      <div class="card-head"><svg class="i"><use href="#i-key"/></svg><h3>تغییر رمز مدیر</h3></div>
+      <div class="card-body">
+        {% include "partials/field.html" with field=password_form.password %}
+        {% include "partials/field.html" with field=password_form.password2 %}
+        <button class="btn btn-ghost btn-block" type="submit">ثبت رمز جدید</button>
+      </div>
+    </form>
+    <form method="post" action="{% url 'manage:shop_delete' shop.pk %}" class="card danger-zone" data-confirm="همه اطلاعات این پت شاپ برای همیشه حذف شود؟">
+      {% csrf_token %}
+      <div class="card-head"><svg class="i" style="color:var(--danger)"><use href="#i-trash"/></svg><h3 style="color:var(--danger)">حذف پت شاپ</h3></div>
+      <div class="card-body">
+        <p class="small muted">برای تأیید، آدرس اختصاصی <b class="ltr">{{ shop.slug }}</b> را بنویسید.</p>
+        <input class="input ltr" name="confirm" autocomplete="off" style="margin-bottom:10px">
+        <button class="btn btn-danger btn-block" type="submit">حذف همیشگی</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

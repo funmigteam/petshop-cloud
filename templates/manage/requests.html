@@ -1,0 +1,24 @@
+{% extends "manage/_base.html" %}{% load fa %}
+{% block page_title %}درخواست‌های عضویت{% endblock %}{% block page_title_text %}درخواست‌ها{% endblock %}
+{% block content %}
+<div class="card">
+  {% if items %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th>پت شاپ</th><th>نام</th><th>تماس</th><th>شهر</th><th>تاریخ</th><th></th></tr></thead>
+    <tbody>{% for r in items %}
+      <tr{% if r.handled %} style="opacity:.55"{% endif %}>
+        <td><b>{{ r.shop_name }}</b>{% if r.message %}<div class="muted small">{{ r.message|truncatechars:90 }}</div>{% endif %}</td>
+        <td>{{ r.owner_name }}</td>
+        <td class="ltr" style="text-align:right">{{ r.phone }}</td>
+        <td>{{ r.city|default:"—" }}</td>
+        <td class="small">{{ r.created_at|jdate:"time" }}</td>
+        <td class="actions">
+          {% if not r.handled %}<a class="btn btn-soft btn-sm" href="{% url 'manage:shop_new' %}">ساخت پنل</a>{% endif %}
+          <form method="post" action="{% url 'manage:request_toggle' r.pk %}" class="inline">{% csrf_token %}<button class="btn btn-ghost btn-sm">{% if r.handled %}برگرداندن{% else %}بررسی شد{% endif %}</button></form>
+          <form method="post" action="{% url 'manage:request_toggle' r.pk %}" class="inline" data-confirm="حذف شود؟">{% csrf_token %}<input type="hidden" name="delete" value="1"><button class="btn btn-danger btn-sm btn-icon"><svg class="i i-sm"><use href="#i-trash"/></svg></button></form>
+        </td>
+      </tr>{% endfor %}
+    </tbody></table></div>
+  {% else %}<div class="empty"><svg class="i"><use href="#i-inbox"/></svg><div>درخواستی نرسیده است. فرم درخواست در <a href="{% url 'join' %}">صفحه عضویت</a> است.</div></div>{% endif %}
+</div>
+{% endblock %}

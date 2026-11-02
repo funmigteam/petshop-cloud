@@ -1,0 +1,8 @@
+{% load fa %}
+{% if page.has_other_pages %}
+<nav class="pagination">
+  {% if page.has_previous %}<a class="btn btn-ghost btn-sm" href="?{% for k, v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v|urlencode }}&{% endif %}{% endfor %}page={{ page.previous_page_number }}">قبلی</a>{% endif %}
+  <span class="btn btn-soft btn-sm">صفحه {{ page.number|fa }} از {{ page.paginator.num_pages|fa }}</span>
+  {% if page.has_next %}<a class="btn btn-ghost btn-sm" href="?{% for k, v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v|urlencode }}&{% endif %}{% endfor %}page={{ page.next_page_number }}">بعدی</a>{% endif %}
+</nav>
+{% endif %}

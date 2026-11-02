@@ -1,0 +1,24 @@
+{% extends "base.html" %}{% load static %}
+{% block body %}
+<div class="dash">
+  <aside class="sidebar">
+    <a class="brand" href="{% url 'home' %}"><img src="{% static 'img/logo.svg' %}" alt=""><span class="ltr">pet-<b>online</b></span></a>
+    {% block sidebar %}{% endblock %}
+    <div class="bottom nav">
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}
+        <button class="btn btn-ghost btn-block" type="submit"><svg class="i"><use href="#i-logout"/></svg>خروج</button>
+      </form>
+    </div>
+  </aside>
+  <div class="main">
+    {% block acting %}{% endblock %}
+    <div class="topbar">
+      <button class="btn btn-ghost btn-icon menu-btn" type="button" data-nav-toggle aria-label="منو"><svg class="i"><use href="#i-menu"/></svg></button>
+      <h1>{% block page_title %}{% endblock %}</h1>
+      <span class="spacer"></span>
+      <div class="top-actions">{% block actions %}{% endblock %}</div>
+    </div>
+    <div class="content">{% block content %}{% endblock %}</div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "panel/_base.html" %}
+{% block page_title %}{% if product %}ویرایش «{{ product.name }}»{% else %}محصول جدید{% endif %}{% endblock %}
+{% block page_title_text %}محصول{% endblock %}
+{% block actions %}<a class="btn btn-ghost" href="{% url 'panel:products' %}"><svg class="i"><use href="#i-back"/></svg>بازگشت</a>{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% include "partials/form_errors.html" %}
+  <div class="grid-2">
+    <div class="card card-body">
+      {% include "partials/field.html" with field=form.name %}
+      <div class="form-grid">
+        {% include "partials/field.html" with field=form.category %}
+        {% include "partials/field.html" with field=form.brand %}
+      </div>
+      {% include "partials/field.html" with field=form.description %}
+      <p class="muted small">قیمت نمایش داده نمی‌شود؛ مشتری برای خرید با فروشگاه تماس می‌گیرد.</p>
+    </div>
+    <div class="stack">
+      <div class="card card-body">{% include "partials/field.html" with field=form.image %}</div>
+      <div class="card card-body">
+        {% include "partials/field.html" with field=form.is_available %}
+        {% include "partials/field.html" with field=form.is_featured %}
+        {% include "partials/field.html" with field=form.order %}
+      </div>
+      <div class="row">
+        <button class="btn btn-lg" type="submit" style="flex:1"><svg class="i"><use href="#i-check"/></svg>ذخیره</button>
+        {% if not product %}<button class="btn btn-lg btn-ghost" type="submit" name="add_another" value="1">ذخیره و بعدی</button>{% endif %}
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

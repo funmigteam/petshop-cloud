@@ -1,0 +1,12 @@
+{% extends "public/_layout.html" %}
+{% block title %}{{ shop.name }}{% endblock %}
+{% block content %}
+<div class="container" style="padding:60px 16px">
+  <div class="card empty" style="max-width:520px;margin:0 auto">
+    <svg class="i"><use href="#i-store"/></svg>
+    <h2 style="color:var(--text)">{{ shop.name }}</h2>
+    <p>صفحه این فروشگاه در حال حاضر در دسترس نیست.</p>
+    <a class="btn" href="{% url 'home' %}">مشاهده پت شاپ‌های دیگر</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% load static %}<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+  <meta name="theme-color" content="#0d9488">
+  <link rel="icon" href="{% static 'img/logo.svg' %}" type="image/svg+xml">
+  <meta name="description" content="pet-online.ir — کاتالوگ آنلاین پت شاپ‌ها">
+  <link rel="preload" href="{% static 'fonts/Vazirmatn-Regular.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% include "partials/icons.html" %}
+  {% include "partials/messages.html" %}
+  {% block body %}{% endblock %}
+  <script src="{% static 'js/app.js' %}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

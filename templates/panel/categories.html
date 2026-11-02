@@ -1,0 +1,47 @@
+{% extends "panel/_base.html" %}{% load fa %}
+{% block page_title %}دسته‌بندی‌ها{% endblock %}{% block page_title_text %}دسته‌بندی‌ها{% endblock %}
+{% block content %}
+<div class="grid-2">
+  <div class="card">
+    {% if cats %}
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>دسته</th><th>محصولات</th><th>ترتیب</th><th></th></tr></thead>
+      <tbody>{% for c in cats %}
+        <tr{% if editing.pk == c.pk %} style="background:var(--brand-50)"{% endif %}>
+          <td><span class="cat-tag"><span class="cat-ic"><svg class="i"><use href="#pi-{{ c.icon }}"/></svg></span><b>{{ c.name }}</b></span></td>
+          <td><a href="{% url 'panel:products' %}?cat={{ c.pk }}">{{ c.n|fa }} محصول</a></td>
+          <td>{{ c.order|fa }}</td>
+          <td class="actions">
+            <a class="btn btn-ghost btn-sm" href="{% url 'panel:category_edit' c.pk %}"><svg class="i i-sm"><use href="#i-edit"/></svg></a>
+            <form method="post" action="{% url 'panel:category_delete' c.pk %}" class="inline" data-confirm="دسته «{{ c.name }}» حذف شود؟ محصولات آن حذف نمی‌شوند.">{% csrf_token %}
+              <button class="btn btn-danger btn-sm btn-icon" aria-label="حذف"><svg class="i i-sm"><use href="#i-trash"/></svg></button></form>
+          </td>
+        </tr>{% endfor %}
+      </tbody></table></div>
+    {% else %}
+      <div class="empty"><svg class="i"><use href="#i-tag"/></svg><div>دسته‌ای ندارید. مثلاً «غذای سگ»، «غذای گربه»، «اسباب‌بازی» — برای هر دسته یک آیکون انتخاب کنید.</div></div>
+    {% endif %}
+  </div>
+  <form method="post" class="card">
+    {% csrf_token %}
+    <div class="card-head"><h3>{% if editing %}ویرایش دسته{% else %}دسته جدید{% endif %}</h3></div>
+    <div class="card-body">
+      {% include "partials/field.html" with field=form.name %}
+      <div class="field">
+        <label>آیکون</label>
+        <div class="icon-picker">
+          {% for key, label in form.fields.icon.choices %}
+          <label class="icon-opt" title="{{ label }}"><input type="radio" name="icon" value="{{ key }}" {% if form.icon.value == key %}checked{% endif %}><svg class="i"><use href="#pi-{{ key }}"/></svg><span>{{ label }}</span></label>
+          {% endfor %}
+        </div>
+        {% for e in form.icon.errors %}<div class="error">{{ e }}</div>{% endfor %}
+      </div>
+      {% include "partials/field.html" with field=form.order %}
+      <div class="row">
+        <button class="btn" type="submit" style="flex:1">{% if editing %}ذخیره{% else %}افزودن{% endif %}</button>
+        {% if editing %}<a class="btn btn-ghost" href="{% url 'panel:categories' %}">انصراف</a>{% endif %}
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

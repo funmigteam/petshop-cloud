@@ -1,0 +1,24 @@
+{% extends "dash_base.html" %}{% load fa %}
+{% block title %}{% block page_title_text %}پنل{% endblock %} — {{ shop.name }}{% endblock %}
+{% block sidebar %}
+<div class="side-shop">
+  {% include "partials/shop_logo.html" with cls="" %}
+  <div style="min-width:0"><b>{{ shop.name }}</b>
+    {% if shop.is_public %}<span class="badge badge-success"><span class="dot"></span>فعال — {{ shop.days_left|fa }} روز</span>
+    {% else %}<span class="badge badge-danger"><span class="dot"></span>غیرفعال</span>{% endif %}
+  </div>
+</div>
+<nav class="nav">
+  <a href="{% url 'panel:dashboard' %}" class="{% if section == 'dashboard' %}active{% endif %}"><svg class="i"><use href="#i-home"/></svg>داشبورد</a>
+  <a href="{% url 'panel:products' %}" class="{% if section == 'products' %}active{% endif %}"><svg class="i"><use href="#i-box"/></svg>محصولات</a>
+  <a href="{% url 'panel:categories' %}" class="{% if section == 'categories' %}active{% endif %}"><svg class="i"><use href="#i-tag"/></svg>دسته‌بندی‌ها</a>
+  <a href="{% url 'panel:location' %}" class="{% if section == 'location' %}active{% endif %}"><svg class="i"><use href="#i-map"/></svg>موقعیت روی نقشه</a>
+  <a href="{% url 'panel:qr' %}" class="{% if section == 'qr' %}active{% endif %}"><svg class="i"><use href="#i-qr"/></svg>QR کد فروشگاه</a>
+  <div class="nav-label">حساب</div>
+  <a href="{% url 'panel:settings' %}" class="{% if section == 'settings' %}active{% endif %}"><svg class="i"><use href="#i-settings"/></svg>اطلاعات فروشگاه</a>
+  <a href="{% url 'panel:billing' %}" class="{% if section == 'billing' %}active{% endif %}"><svg class="i"><use href="#i-card"/></svg>خرید اشتراک</a>
+  <a href="{% url 'panel:password' %}" class="{% if section == 'password' %}active{% endif %}"><svg class="i"><use href="#i-key"/></svg>تغییر رمز</a>
+  <a href="{{ shop.get_absolute_url }}" target="_blank"><svg class="i"><use href="#i-eye"/></svg>مشاهده صفحه فروشگاه</a>
+</nav>
+{% endblock %}
+{% block acting %}{% if acting %}<div class="acting-bar"><svg class="i i-sm"><use href="#i-users"/></svg>شما (ادمین) در حال مدیریت «{{ shop.name }}» هستید. <a href="{% url 'panel:exit' %}">بازگشت به پنل اصلی</a></div>{% endif %}{% endblock %}

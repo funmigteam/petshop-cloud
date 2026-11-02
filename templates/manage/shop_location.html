@@ -1,0 +1,31 @@
+{% extends "manage/_base.html" %}{% load static %}
+{% block page_title %}موقعیت «{{ shop.name }}» روی نقشه{% endblock %}{% block page_title_text %}موقعیت روی نقشه{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">{% endblock %}
+{% block actions %}<a class="btn btn-ghost" href="{% url 'manage:shop' shop.pk %}"><svg class="i"><use href="#i-back"/></svg>بازگشت</a>{% endblock %}
+{% block content %}
+<div class="card card-body">
+  <p class="muted">محل دقیق «{{ shop.name }}» را روی نقشه مشخص کنید تا در نقشهٔ عمومی پت شاپ‌ها دیده شود.</p>
+  <form method="post">
+    {% csrf_token %}
+    {% include "partials/form_errors.html" %}
+    <div class="map-locate">
+      <button class="btn btn-soft btn-sm" type="button" id="map-locate-btn"><svg class="i i-sm"><use href="#i-crosshair"/></svg>موقعیت من</button>
+      <span class="map-coords" id="map-coords">{% if shop.lat %}{{ shop.lat }}, {{ shop.lng }}{% else %}هنوز موقعیتی ثبت نشده{% endif %}</span>
+    </div>
+    <div class="map-picker" id="map-picker" data-lat="id_lat" data-lng="id_lng"></div>
+    {{ form.lat }}{{ form.lng }}
+    <button class="btn btn-lg btn-block" type="submit"><svg class="i"><use href="#i-check"/></svg>ذخیره موقعیت</button>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  window.MAP_TILE_URL = "{{ MAP_TILE_URL }}";
+  window.MAP_TILE_ATTRIBUTION = "{{ MAP_TILE_ATTRIBUTION|escapejs }}";
+  window.MAP_DEFAULT_LAT = {{ MAP_DEFAULT_LAT }};
+  window.MAP_DEFAULT_LNG = {{ MAP_DEFAULT_LNG }};
+  window.LEAFLET_IMG_BASE = "{% static 'vendor/leaflet/images/' %}";
+</script>
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'js/map.js' %}"></script>
+{% endblock %}

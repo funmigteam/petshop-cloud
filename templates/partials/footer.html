@@ -1,0 +1,25 @@
+{% load static fa %}
+<footer class="site-footer">
+  <div class="container">
+    <div class="foot-brand">
+      <a class="brand" href="{% url 'home' %}"><img src="{% static 'img/logo.svg' %}" alt=""><span class="ltr">pet-<b>online</b>.ir</span></a>
+      <p>کاتالوگ آنلاین پت شاپ‌ها — غذا، لوازم و اکسسوری حیوانات خانگی، با منوی QR اختصاصی برای هر فروشگاه.</p>
+    </div>
+    <nav class="foot-links">
+      <a href="{% url 'home' %}">صفحه اصلی</a>
+      <a href="{% url 'shops_map' %}">نقشه پت شاپ‌ها</a>
+      <a href="{% url 'join' %}">ثبت پت شاپ</a>
+      <a href="{% url 'login' %}">ورود مدیران</a>
+    </nav>
+    {% if site_config.support_phone %}
+    <a class="foot-support" href="tel:{{ site_config.support_phone }}">
+      <span class="ic"><svg class="i"><use href="#i-phone"/></svg></span>
+      <span><small>پشتیبانی</small><b class="ltr">{{ site_config.support_phone }}</b></span>
+    </a>
+    {% endif %}
+    <div class="foot-bottom">
+      <span>© {{ JALALI_YEAR|fa }} <span class="ltr">pet-online.ir</span> — تمامی حقوق محفوظ است.</span>
+      <span>طراحی و توسعه توسط <a class="funmig ltr" href="https://funmig.com" target="_blank" rel="noopener">FunMig</a></span>
+    </div>
+  </div>
+</footer>

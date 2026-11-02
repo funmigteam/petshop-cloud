@@ -1,0 +1,73 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}QR — {{ shop.name }}{% endblock %}
+{% block head %}<style>
+  body { background: #e2e8f0; }
+  .sheet { background: #fff; color: #0f172a; text-align: center; box-shadow: var(--shadow-lg); margin: 24px auto; }
+  .sheet .logo { border-radius: 22%; object-fit: cover; margin: 0 auto 6px; }
+  .sheet h1 { margin: 0; overflow-wrap: anywhere; }
+  .sheet .qr { margin: 0 auto 4px; }
+  .sheet .scan { font-weight: 700; color: {{ shop.theme_color }}; }
+  .sheet .foot { display: flex; gap: 6px; justify-content: center; align-items: center; color: #64748b; }
+
+  /* کارت کوچک — مناسب چاپ روی کارت ویزیت (۹×۵.۵ سانتی‌متر) */
+  .sheet.card-sm { width: min(90mm, calc(100% - 32px)); border-radius: 12px; padding: 6mm; }
+  .sheet.card-sm .logo { width: 38px; height: 38px; }
+  .sheet.card-sm h1 { font-size: 14px; }
+  .sheet.card-sm .tag { font-size: 10.5px; color: #64748b; }
+  .sheet.card-sm .qr { width: 100%; max-width: 50mm; margin-top: 3mm; }
+  .sheet.card-sm .scan { font-size: 11px; margin-top: 2mm; }
+  .sheet.card-sm .url { font-size: 9.5px; margin-top: 2px; }
+  .sheet.card-sm .foot { margin-top: 3mm; font-size: 9px; }
+  .sheet.card-sm .foot img { width: 14px; height: 14px; }
+
+  /* برگه A5 — مناسب چاپ روی ویترین */
+  .sheet.sheet-a5 { width: min(148mm, calc(100% - 32px)); border-radius: 18px; padding: 14mm 12mm; }
+  .sheet.sheet-a5 .logo { width: 80px; height: 80px; }
+  .sheet.sheet-a5 h1 { font-size: clamp(20px, 6vw, 26px); }
+  .sheet.sheet-a5 .tag { font-size: 14px; color: #64748b; }
+  .sheet.sheet-a5 .qr { width: 100%; max-width: 110mm; margin-top: 8mm; }
+  .sheet.sheet-a5 .scan { font-size: 18px; margin-top: 4mm; }
+  .sheet.sheet-a5 .url { font-size: 13px; margin-top: 4px; }
+  .sheet.sheet-a5 .foot { margin-top: 8mm; font-size: 13px; }
+  .sheet.sheet-a5 .foot img { width: 22px; height: 22px; }
+
+  @media print {
+    @page { margin: 0; }
+    .sheet { margin: 0 auto; box-shadow: none; }
+  }
+
+  .size-toggle { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+  .size-toggle .btn.active { background: var(--brand); color: #fff; }
+</style>{% endblock %}
+{% block body %}
+<div class="no-print" style="text-align:center;padding-top:20px">
+  <div class="size-toggle">
+    <button class="btn btn-ghost active" type="button" data-size="card-sm">کارت کوچک (مناسب کیف پول)</button>
+    <button class="btn btn-ghost" type="button" data-size="sheet-a5">برگه A5 (مناسب ویترین)</button>
+  </div>
+  <button class="btn" onclick="window.print()"><svg class="i"><use href="#i-print"/></svg>چاپ</button>
+  <a class="btn btn-ghost" href="{{ shop.get_absolute_url }}">بازگشت به صفحه فروشگاه</a>
+</div>
+<div class="sheet card-sm" id="print-sheet">
+  {% if shop.logo %}<img class="logo" src="{{ shop.logo.url }}" alt="">{% endif %}
+  <h1>{{ shop.name }}</h1>
+  {% if shop.tagline %}<div class="tag">{{ shop.tagline }}</div>{% endif %}
+  <img class="qr" src="{% url 'shop_qr' shop.slug %}?size=large" alt="QR">
+  <div class="scan">{{ shop.qr_caption|default:"برای دیدن محصولات، اسکن کنید" }}</div>
+  <div class="foot"><img src="{% static 'img/logo.svg' %}" alt=""></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function () {
+    var sheet = document.getElementById("print-sheet");
+    var btns = document.querySelectorAll(".size-toggle [data-size]");
+    btns.forEach(function (b) {
+      b.addEventListener("click", function () {
+        sheet.className = "sheet " + b.dataset.size;
+        btns.forEach(function (x) { x.classList.toggle("active", x === b); });
+      });
+    });
+  })();
+</script>
+{% endblock %}

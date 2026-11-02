@@ -1,0 +1,22 @@
+{% extends "public/_layout.html" %}{% load static %}
+{% block title %}نقشه پت شاپ‌ها — {{ SITE_NAME }}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">{% endblock %}
+{% block content %}
+<div class="map-page" style="position:relative">
+  <div class="near-me-box">
+    <button class="btn" type="button" id="near-me-btn"><svg class="i i-sm"><use href="#i-crosshair"/></svg>پت شاپ‌های نزدیک من</button>
+  </div>
+  <div class="map-full" id="shops-map" data-src="{% url 'shops_map_data' %}"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  window.MAP_TILE_URL = "{{ MAP_TILE_URL }}";
+  window.MAP_TILE_ATTRIBUTION = "{{ MAP_TILE_ATTRIBUTION|escapejs }}";
+  window.MAP_DEFAULT_LAT = {{ MAP_DEFAULT_LAT }};
+  window.MAP_DEFAULT_LNG = {{ MAP_DEFAULT_LNG }};
+  window.LEAFLET_IMG_BASE = "{% static 'vendor/leaflet/images/' %}";
+</script>
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'js/map.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "manage/_base.html" %}{% load fa %}
+{% block page_title %}پت شاپ‌ها{% endblock %}{% block page_title_text %}پت شاپ‌ها{% endblock %}
+{% block actions %}<a class="btn" href="{% url 'manage:shop_new' %}"><svg class="i"><use href="#i-plus"/></svg>ثبت پت شاپ</a>{% endblock %}
+{% block content %}
+<div class="row" style="margin-bottom:16px">
+  <div class="tabs">
+    <a href="?q={{ q|urlencode }}" class="{% if not status %}active{% endif %}">همه</a>
+    <a href="?status=active&q={{ q|urlencode }}" class="{% if status == 'active' %}active{% endif %}">فعال</a>
+    <a href="?status=expired&q={{ q|urlencode }}" class="{% if status == 'expired' %}active{% endif %}">منقضی</a>
+    <a href="?status=disabled&q={{ q|urlencode }}" class="{% if status == 'disabled' %}active{% endif %}">غیرفعال</a>
+  </div>
+  <span class="spacer"></span>
+  <form method="get" class="row" style="gap:6px"><input type="hidden" name="status" value="{{ status }}">
+    <input class="input" type="search" name="q" value="{{ q }}" placeholder="نام، آدرس، نام کاربری، تلفن…" style="width:min(260px, calc(100vw - 100px))"><button class="btn btn-ghost btn-icon"><svg class="i"><use href="#i-search"/></svg></button></form>
+</div>
+<div class="card">
+  {% if page.object_list %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th></th><th>پت شاپ</th><th>مالک</th><th>محصول</th><th>اشتراک</th><th>بازدید</th><th></th></tr></thead>
+    <tbody>{% for shop in page %}
+      <tr>
+        <td style="width:60px">{% include "partials/shop_logo.html" with cls="thumb" %}</td>
+        <td><a href="{% url 'manage:shop' shop.pk %}" style="color:var(--text)"><b>{{ shop.name }}</b></a>{% if shop.is_featured %} <span class="badge badge-accent">ویژه</span>{% endif %}<div class="muted small ltr" style="text-align:right">/s/{{ shop.slug }}/</div></td>
+        <td class="ltr" style="text-align:right">{{ shop.owner.username }}</td>
+        <td>{{ shop.product_count|fa }}</td>
+        <td>{% include "manage/_status.html" %}</td>
+        <td>{{ shop.views|money }}</td>
+        <td class="actions">
+          <a class="btn btn-soft btn-sm" href="{% url 'manage:shop_enter' shop.pk %}">ورود به پنل</a>
+          <a class="btn btn-ghost btn-sm" href="{% url 'manage:shop' shop.pk %}">جزئیات</a>
+        </td>
+      </tr>{% endfor %}
+    </tbody></table></div>
+  {% else %}
+    <div class="empty"><svg class="i"><use href="#i-store"/></svg><div>پت شاپی پیدا نشد.</div></div>
+  {% endif %}
+</div>
+{% include "partials/pagination.html" %}
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "public/_layout.html" %}{% load static fa %}
+{% block title %}{{ SITE_NAME }} — کاتالوگ آنلاین پت شاپ‌ها{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1>{{ config.hero_title }}</h1>
+    <p class="lead">{{ config.hero_subtitle }}</p>
+    <form class="search" method="get" action="{% url 'home' %}">
+      <input class="input" type="search" name="q" value="{{ q }}" placeholder="نام پت شاپ یا محصول… مثلاً غذای گربه">
+      {% if cities %}
+      <select class="input" name="city">
+        <option value="">همه شهرها</option>
+        {% for c in cities %}<option value="{{ c }}" {% if c == city %}selected{% endif %}>{{ c }}</option>{% endfor %}
+      </select>
+      {% endif %}
+      <button class="btn" type="submit"><svg class="i"><use href="#i-search"/></svg><span>جستجو</span></button>
+    </form>
+  </div>
+</section>
+
+{% if featured %}
+<section class="section">
+  <div class="container">
+    <div class="section-head"><h2>پت شاپ‌های ویژه</h2></div>
+    <div class="banners">
+      {% for shop in featured %}
+      <a class="banner-card" href="{{ shop.get_absolute_url }}">
+        <img class="bg" src="{{ shop.banner.url }}" alt="" loading="lazy">
+        <div class="info">
+          {% if shop.logo %}<img src="{{ shop.logo.url }}" alt="">{% endif %}
+          <div><h3>{{ shop.name }}</h3><p>{{ shop.tagline }}</p></div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>{% if q or city %}نتایج جستجو{% else %}همه پت شاپ‌ها{% endif %}</h2>
+      <span class="muted small">{{ shops|length|fa }} فروشگاه</span>
+      {% if q or city %}<span class="spacer"></span><a class="btn btn-ghost btn-sm" href="{% url 'home' %}">پاک کردن</a>{% endif %}
+    </div>
+    {% if shops %}
+    <div class="shop-grid">
+      {% for shop in shops %}
+      <a class="shop-card" href="{{ shop.get_absolute_url }}">
+        <div class="cover">
+          {% if shop.banner %}<img class="cover-img" src="{{ shop.banner.url }}" alt="" loading="lazy">{% endif %}
+          {% include "partials/shop_logo.html" with cls="logo" %}
+        </div>
+        <div class="body">
+          <h3>{{ shop.name }}</h3>
+          <div class="muted small">{{ shop.tagline|default:"&nbsp;" }}</div>
+          <div class="meta">
+            {% if shop.city %}<span><svg class="i i-sm"><use href="#i-map"/></svg>{{ shop.city }}</span>{% endif %}
+            <span><svg class="i i-sm"><use href="#i-box"/></svg>{{ shop.product_count|fa }} محصول</span>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+      <div class="card empty"><svg class="i"><use href="#i-store"/></svg><div>پت شاپی پیدا نشد.</div></div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta">
+      <div><h2>پت شاپ دارید؟</h2><p>کاتالوگ آنلاین، پنل مدیریت ساده و QR کد اختصاصی برای فروشگاهتان.</p></div>
+      <span class="spacer"></span>
+      <a class="btn btn-lg" href="{% url 'join' %}">درخواست عضویت</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

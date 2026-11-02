@@ -1,0 +1,125 @@
+{% extends "base.html" %}{% load static fa %}
+{% block title %}{{ shop.name }} — {{ SITE_NAME }}{% endblock %}
+{% block head %}<meta name="theme-color" content="{{ shop.theme_color }}"><style>:root{--shop: {{ shop.theme_color }};}</style>
+{% if shop.has_location %}<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">{% endif %}
+{% endblock %}
+{% block body %}
+{% if is_manager %}
+<div class="manager-bar"><div class="container">
+  <svg class="i i-sm"><use href="#i-eye"/></svg>
+  <span>این پیش‌نمایش صفحه فروشگاه شماست.</span>
+  {% if not shop.is_public %}<span class="badge badge-danger">برای عموم غیرفعال — {% if not shop.is_active %}توسط ادمین{% else %}اشتراک تمام شده{% endif %}</span>{% endif %}
+  <span class="spacer"></span><a href="{% url 'panel:dashboard' %}">بازگشت به پنل ←</a>
+</div></div>
+{% endif %}
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="{% url 'home' %}"><img src="{% static 'img/logo.svg' %}" alt=""><span class="ltr">pet-<b>online</b></span></a>
+  </div>
+</header>
+
+<div class="shop-hero"><div class="cover">{% if shop.banner %}<img src="{{ shop.banner.url }}" alt="">{% endif %}</div></div>
+<main class="container">
+  <div class="shop-head">
+    {% include "partials/shop_logo.html" with cls="logo" %}
+    <div style="flex:1;min-width:200px">
+      <h1>{{ shop.name }}</h1>
+      {% if shop.tagline %}<p class="tagline">{{ shop.tagline }}</p>{% endif %}
+    </div>
+    {% if shop.phone %}<a class="btn" style="background:var(--shop)" href="tel:{{ shop.phone }}"><svg class="i"><use href="#i-phone"/></svg>تماس</a>{% endif %}
+    {% if shop.description or shop.address or shop.working_hours or shop.instagram %}
+    <div style="flex-basis:100%">
+      {% if shop.description %}<p class="muted" style="margin:0">{{ shop.description|linebreaksbr }}</p>{% endif %}
+      <div class="shop-info">
+        {% if shop.address %}<span><svg class="i"><use href="#i-map"/></svg>{% if shop.city %}{{ shop.city }}، {% endif %}{{ shop.address }}</span>{% endif %}
+        {% if shop.working_hours %}<span><svg class="i"><use href="#i-clock"/></svg>{{ shop.working_hours }}</span>{% endif %}
+        {% if shop.phone %}<span><svg class="i"><use href="#i-phone"/></svg><span class="ltr">{{ shop.phone }}</span></span>{% endif %}
+        {% if shop.instagram %}<span><svg class="i"><use href="#i-insta"/></svg><span class="ltr">@{{ shop.instagram }}</span></span>{% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-body qr-show">
+      <img src="{% url 'shop_qr' shop.slug %}" alt="QR {{ shop.name }}" style="width:120px;height:120px">
+      <div style="flex:1;min-width:220px">
+        <h3 style="font-size:15px;margin:0 0 4px">QR اختصاصی {{ shop.name }}</h3>
+        {% if is_manager %}
+        <a class="btn btn-soft btn-sm" href="{% url 'shop_qr_print' shop.slug %}" target="_blank"><svg class="i i-sm"><use href="#i-print"/></svg>نسخه چاپی</a>
+        <a class="btn btn-ghost btn-sm" href="{% url 'shop_qr' shop.slug %}?size=large&download=1"><svg class="i i-sm"><use href="#i-download"/></svg>دانلود</a>
+        {% endif %}
+      </div>
+    </div>
+    {% if shop.has_location %}
+    <div class="shop-map" id="shop-map" data-lat="{{ shop.lat }}" data-lng="{{ shop.lng }}" data-name="{{ shop.name }}"></div>
+    {% endif %}
+  </div>
+
+  {% if product_count %}
+  <div class="cat-bar">
+    <div class="scroll">
+      {% if featured %}<button class="chip" type="button" data-target="sec-featured"><svg class="i i-sm"><use href="#i-star"/></svg>پیشنهاد ویژه</button>{% endif %}
+      {% for c in categories %}<button class="chip" type="button" data-target="sec-{{ c.pk }}"><svg class="i i-sm"><use href="#pi-{{ c.icon }}"/></svg>{{ c.name }}</button>{% endfor %}
+      {% if uncategorized %}<button class="chip" type="button" data-target="sec-other"><svg class="i i-sm"><use href="#pi-paw"/></svg>سایر</button>{% endif %}
+    </div>
+    <div class="catalog-search">
+      <svg class="i"><use href="#i-search"/></svg>
+      <input class="input" id="catalog-search" type="search" placeholder="جستجو در {{ product_count|fa }} محصول…">
+    </div>
+  </div>
+
+  {% if featured %}
+  <section class="cat-section" id="sec-featured">
+    <h2><span class="cat-ic"><svg class="i"><use href="#i-star"/></svg></span>پیشنهاد ویژه</h2>
+    <div class="product-grid">{% for p in featured %}{% include "public/_product.html" %}{% endfor %}</div>
+  </section>
+  {% endif %}
+  {% for c in categories %}
+  <section class="cat-section" id="sec-{{ c.pk }}">
+    <h2><span class="cat-ic"><svg class="i"><use href="#pi-{{ c.icon }}"/></svg></span>{{ c.name }} <span class="count">{{ c.n|fa }}</span></h2>
+    <div class="product-grid">{% for p in c.products.all %}{% include "public/_product.html" %}{% endfor %}</div>
+  </section>
+  {% endfor %}
+  {% if uncategorized %}
+  <section class="cat-section" id="sec-other">
+    <h2><span class="cat-ic"><svg class="i"><use href="#pi-paw"/></svg></span>سایر محصولات</h2>
+    <div class="product-grid">{% for p in uncategorized %}{% include "public/_product.html" %}{% endfor %}</div>
+  </section>
+  {% endif %}
+  <div id="catalog-empty" class="empty hidden">محصولی با این نام پیدا نشد.</div>
+  {% else %}
+    <div class="card empty" style="margin-top:24px"><svg class="i"><use href="#i-box"/></svg><div>هنوز محصولی ثبت نشده است.</div></div>
+  {% endif %}
+</main>
+
+<div class="modal" id="product-modal" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <button class="modal-close" type="button" aria-label="بستن"><svg class="i"><use href="#i-x"/></svg></button>
+    <div class="m-img"></div>
+    <div class="m-body">
+      <div class="row" style="gap:6px;margin-bottom:8px">
+        <span class="badge badge-brand" id="m-cat"></span>
+        <span class="badge badge-danger" id="m-av">ناموجود</span>
+      </div>
+      <h2 id="m-name" style="margin:0"></h2>
+      <div class="muted" id="m-brand"></div>
+      <p id="m-desc" style="margin-top:12px;white-space:pre-line"></p>
+      {% if shop.phone %}<a class="btn btn-block" style="background:var(--shop)" href="tel:{{ shop.phone }}"><svg class="i"><use href="#i-phone"/></svg>استعلام موجودی از فروشگاه</a>{% endif %}
+    </div>
+  </div>
+</div>
+
+{% include "partials/footer.html" %}
+{% endblock %}
+{% block scripts %}
+{% if shop.has_location %}
+<script>
+  window.MAP_TILE_URL = "{{ MAP_TILE_URL }}";
+  window.MAP_TILE_ATTRIBUTION = "{{ MAP_TILE_ATTRIBUTION|escapejs }}";
+  window.LEAFLET_IMG_BASE = "{% static 'vendor/leaflet/images/' %}";
+</script>
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'js/map.js' %}"></script>
+{% endif %}
+{% endblock %}

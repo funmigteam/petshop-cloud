@@ -1,0 +1,50 @@
+{% extends "manage/_base.html" %}
+{% block page_title %}{% if creating %}ثبت پت شاپ جدید{% else %}ویرایش «{{ shop.name }}»{% endif %}{% endblock %}
+{% block page_title_text %}پت شاپ{% endblock %}
+{% block actions %}<a class="btn btn-ghost" href="{% if shop %}{% url 'manage:shop' shop.pk %}{% else %}{% url 'manage:shops' %}{% endif %}"><svg class="i"><use href="#i-back"/></svg>بازگشت</a>{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% include "partials/form_errors.html" %}
+  <div class="grid-2">
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>اطلاعات اصلی</h3></div><div class="card-body">
+        <div class="form-grid">
+          {% include "partials/field.html" with field=form.name %}
+          {% include "partials/field.html" with field=form.slug %}
+        </div>
+        {% include "partials/field.html" with field=form.tagline %}
+        {% include "partials/field.html" with field=form.description %}
+        <div class="form-grid">
+          {% include "partials/field.html" with field=form.phone %}
+          {% include "partials/field.html" with field=form.city %}
+          {% include "partials/field.html" with field=form.address full=1 %}
+          {% include "partials/field.html" with field=form.working_hours %}
+          {% include "partials/field.html" with field=form.instagram %}
+        </div>
+      </div></div>
+      {% if creating %}
+      <div class="card"><div class="card-head"><h3>حساب مدیر پت شاپ</h3></div><div class="card-body">
+        <div class="form-grid">
+          {% include "partials/field.html" with field=form.username %}
+          {% include "partials/field.html" with field=form.password %}
+        </div>
+        {% include "partials/field.html" with field=form.initial_days %}
+      </div></div>
+      {% endif %}
+    </div>
+    <div class="stack">
+      <div class="card card-body">
+        {% include "partials/field.html" with field=form.logo %}
+        {% include "partials/field.html" with field=form.banner wide=1 %}
+        {% include "partials/field.html" with field=form.theme_color %}
+      </div>
+      <div class="card card-body">
+        {% include "partials/field.html" with field=form.is_active %}
+        {% include "partials/field.html" with field=form.is_featured %}
+      </div>
+      <button class="btn btn-lg btn-block" type="submit"><svg class="i"><use href="#i-check"/></svg>{% if creating %}ساخت پت شاپ و پنل{% else %}ذخیره{% endif %}</button>
+    </div>
+  </div>
+</form>
+{% endblock %}

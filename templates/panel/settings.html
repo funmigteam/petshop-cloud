@@ -1,0 +1,31 @@
+{% extends "panel/_base.html" %}
+{% block page_title %}اطلاعات فروشگاه{% endblock %}{% block page_title_text %}اطلاعات فروشگاه{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% include "partials/form_errors.html" %}
+  <div class="grid-2">
+    <div class="card card-body">
+      {% include "partials/field.html" with field=form.name %}
+      {% include "partials/field.html" with field=form.tagline %}
+      {% include "partials/field.html" with field=form.description %}
+      <div class="form-grid">
+        {% include "partials/field.html" with field=form.phone %}
+        {% include "partials/field.html" with field=form.city %}
+        {% include "partials/field.html" with field=form.address full=1 %}
+        {% include "partials/field.html" with field=form.working_hours %}
+        {% include "partials/field.html" with field=form.instagram %}
+      </div>
+    </div>
+    <div class="stack">
+      <div class="card card-body">
+        {% include "partials/field.html" with field=form.logo %}
+        {% include "partials/field.html" with field=form.banner wide=1 %}
+        {% include "partials/field.html" with field=form.theme_color %}
+      </div>
+      <button class="btn btn-lg btn-block" type="submit"><svg class="i"><use href="#i-check"/></svg>ذخیره تغییرات</button>
+      <p class="muted small">آدرس صفحه شما: <span class="ltr">{{ shop.public_url }}</span> — برای تغییر آن با پشتیبانی تماس بگیرید.</p>
+    </div>
+  </div>
+</form>
+{% endblock %}

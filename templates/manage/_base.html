@@ -1,0 +1,19 @@
+{% extends "dash_base.html" %}{% load fa %}
+{% block title %}{% block page_title_text %}مدیریت{% endblock %} — مدیریت pet-online{% endblock %}
+{% block sidebar %}
+<div class="side-shop"><div class="ph" style="background:#0f172a"><svg class="i"><use href="#i-users"/></svg></div><div><b>پنل اصلی</b><span class="muted small">{{ user.username }}</span></div></div>
+<nav class="nav">
+  <a href="{% url 'manage:dashboard' %}" class="{% if section == 'dashboard' %}active{% endif %}"><svg class="i"><use href="#i-chart"/></svg>داشبورد</a>
+  <a href="{% url 'manage:shops' %}" class="{% if section == 'shops' %}active{% endif %}"><svg class="i"><use href="#i-store"/></svg>پت شاپ‌ها</a>
+  <a href="{% url 'manage:shop_new' %}"><svg class="i"><use href="#i-plus"/></svg>ثبت پت شاپ جدید</a>
+  <a href="{% url 'manage:requests' %}" class="{% if section == 'requests' %}active{% endif %}"><svg class="i"><use href="#i-inbox"/></svg>درخواست‌های عضویت{% if pending_requests %}<span class="count">{{ pending_requests|fa }}</span>{% endif %}</a>
+  <div class="nav-label">فروش</div>
+  <a href="{% url 'manage:plans' %}" class="{% if section == 'plans' %}active{% endif %}"><svg class="i"><use href="#i-tag"/></svg>پلن‌های اشتراک</a>
+  <a href="{% url 'manage:payments' %}" class="{% if section == 'payments' %}active{% endif %}"><svg class="i"><use href="#i-card"/></svg>پرداخت‌ها</a>
+  <div class="nav-label">سایت</div>
+  <a href="{% url 'manage:site' %}" class="{% if section == 'site' %}active{% endif %}"><svg class="i"><use href="#i-settings"/></svg>تنظیمات صفحه اصلی</a>
+  <a href="{% url 'shops_map' %}" target="_blank"><svg class="i"><use href="#i-map"/></svg>نقشه پت شاپ‌ها</a>
+  <a href="{% url 'home' %}" target="_blank"><svg class="i"><use href="#i-globe"/></svg>مشاهده سایت</a>
+  {% if user.is_superuser %}<a href="{% url 'admin:index' %}"><svg class="i"><use href="#i-key"/></svg>جنگو ادمین (پیشرفته)</a>{% endif %}
+</nav>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "panel/_base.html" %}{% load fa %}
+{% block page_title %}محصولات{% endblock %}{% block page_title_text %}محصولات{% endblock %}
+{% block actions %}<a class="btn" href="{% url 'panel:product_new' %}"><svg class="i"><use href="#i-plus"/></svg>محصول جدید</a>{% endblock %}
+{% block content %}
+<form class="filters" method="get">
+  <input class="input" type="search" name="q" value="{{ q }}" placeholder="جستجوی نام یا برند…">
+  <select class="input" name="cat" onchange="this.form.submit()">
+    <option value="">همه دسته‌ها</option>
+    {% for c in categories %}<option value="{{ c.pk }}" {% if cat == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+    <option value="none" {% if cat == "none" %}selected{% endif %}>بدون دسته</option>
+  </select>
+  <button class="btn btn-ghost" type="submit"><svg class="i"><use href="#i-search"/></svg></button>
+</form>
+<div class="card">
+  {% if page.object_list %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th></th><th>محصول</th><th>دسته</th><th>وضعیت</th><th></th></tr></thead>
+    <tbody>
+    {% for p in page %}
+    <tr>
+      <td style="width:60px">{% if p.image %}<img class="thumb" src="{{ p.image.url }}" alt="">{% else %}<div class="thumb"></div>{% endif %}</td>
+      <td><a href="{% url 'panel:product_edit' p.pk %}" style="color:var(--text)"><b>{{ p.name }}</b></a>{% if p.is_featured %} <span class="badge badge-accent">ویژه</span>{% endif %}<div class="muted small">{{ p.brand }}</div></td>
+      <td>{% if p.category %}<span class="cat-tag"><svg class="i i-sm"><use href="#pi-{{ p.category.icon }}"/></svg>{{ p.category.name }}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+      <td>
+        <form method="post" action="{% url 'panel:product_toggle' p.pk %}" class="inline">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button class="badge {% if p.is_available %}badge-success{% else %}badge-danger{% endif %}" style="cursor:pointer;font-family:inherit" title="تغییر وضعیت">{% if p.is_available %}موجود{% else %}ناموجود{% endif %}</button>
+        </form>
+      </td>
+      <td class="actions">
+        <a class="btn btn-ghost btn-sm" href="{% url 'panel:product_edit' p.pk %}"><svg class="i i-sm"><use href="#i-edit"/></svg>ویرایش</a>
+        <form method="post" action="{% url 'panel:product_delete' p.pk %}" class="inline" data-confirm="«{{ p.name }}» حذف شود؟">{% csrf_token %}
+          <button class="btn btn-danger btn-sm btn-icon" aria-label="حذف"><svg class="i i-sm"><use href="#i-trash"/></svg></button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}
+  <div class="empty"><svg class="i"><use href="#i-box"/></svg><div>{% if q or cat %}محصولی با این فیلتر پیدا نشد.{% else %}هنوز محصولی ندارید.{% endif %}</div>
+    <a class="btn" style="margin-top:12px" href="{% url 'panel:product_new' %}"><svg class="i"><use href="#i-plus"/></svg>محصول جدید</a></div>
+  {% endif %}
+</div>
+{% include "partials/pagination.html" %}
+{% endblock %}

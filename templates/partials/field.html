@@ -1,0 +1,24 @@
+{% with w=field.field.widget %}
+<div class="field{% if field.errors %} has-error{% endif %}{% if full %} full{% endif %}">
+  {% if w.input_type == "checkbox" %}
+    <div class="field-check"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>
+  {% elif w.input_type == "file" %}
+    <label>{{ field.label }}</label>
+    <div class="upload">
+      <div class="preview{% if wide %} wide{% endif %}">{% if field.value and field.value.url %}<img src="{{ field.value.url }}" alt="">{% else %}<svg class="i i-lg"><use href="#i-image"/></svg>{% endif %}</div>
+      <div>
+        <input type="file" name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="file-input" accept="image/*">
+        {% if field.value and field.value.url and not field.field.required %}
+          <label class="clear"><input type="checkbox" name="{{ field.html_name }}-clear" id="{{ field.html_name }}-clear_id"> حذف تصویر فعلی</label>
+        {% endif %}
+        <div class="help">JPG یا PNG — خودکار کوچک و بهینه می‌شود.</div>
+      </div>
+    </div>
+  {% else %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span style="color:var(--danger)">*</span>{% endif %}</label>
+    {{ field }}
+  {% endif %}
+  {% if field.help_text and w.input_type != "file" %}<div class="help">{{ field.help_text }}</div>{% endif %}
+  {% for e in field.errors %}<div class="error">{{ e }}</div>{% endfor %}
+</div>
+{% endwith %}

@@ -1,0 +1,20 @@
+{% extends "public/_layout.html" %}
+{% block title %}درخواست عضویت — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container" style="padding:40px 16px;max-width:640px">
+  <h1>درخواست ثبت پت شاپ</h1>
+  <p class="muted">اطلاعات را وارد کنید؛ همکاران ما برای ساخت پنل اختصاصی با شما تماس می‌گیرند.</p>
+  <form method="post" class="card card-body">
+    {% csrf_token %}
+    {% include "partials/form_errors.html" %}
+    <div class="form-grid">
+      {% include "partials/field.html" with field=form.shop_name %}
+      {% include "partials/field.html" with field=form.owner_name %}
+      {% include "partials/field.html" with field=form.phone %}
+      {% include "partials/field.html" with field=form.city %}
+      {% include "partials/field.html" with field=form.message full=1 %}
+    </div>
+    <button class="btn btn-lg btn-block" type="submit">ارسال درخواست</button>
+  </form>
+</div>
+{% endblock %}

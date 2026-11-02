@@ -1,0 +1,12 @@
+{% extends "manage/_base.html" %}
+{% block page_title %}تنظیمات صفحه اصلی{% endblock %}{% block page_title_text %}تنظیمات{% endblock %}
+{% block content %}
+<form method="post" class="card card-body" style="max-width:720px">
+  {% csrf_token %}
+  {% include "partials/field.html" with field=form.hero_title %}
+  {% include "partials/field.html" with field=form.hero_subtitle %}
+  {% include "partials/field.html" with field=form.support_phone %}
+  {% include "partials/field.html" with field=form.about %}
+  <button class="btn" type="submit">ذخیره</button>
+</form>
+{% endblock %}

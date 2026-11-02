@@ -1,0 +1,71 @@
+{% extends "panel/_base.html" %}{% load fa %}
+{% block page_title %}داشبورد{% endblock %}{% block page_title_text %}داشبورد{% endblock %}
+{% block actions %}<a class="btn" href="{% url 'panel:product_new' %}"><svg class="i"><use href="#i-plus"/></svg>محصول جدید</a>{% endblock %}
+{% block content %}
+{% if not shop.has_subscription %}
+<div class="alert alert-error"><svg class="i"><use href="#i-alert"/></svg><div>اشتراک شما به پایان رسیده و صفحه فروشگاه برای مشتریان نمایش داده نمی‌شود. <a href="{% url 'panel:billing' %}"><b>تمدید اشتراک</b></a></div></div>
+{% elif shop.days_left < 5 %}
+<div class="alert alert-warning"><svg class="i"><use href="#i-clock"/></svg><div>فقط {{ shop.days_left|fa }} روز از اشتراک شما باقی مانده است. <a href="{% url 'panel:billing' %}"><b>تمدید</b></a></div></div>
+{% endif %}
+
+<div class="stats">
+  <div class="stat"><div class="ic"><svg class="i"><use href="#i-box"/></svg></div><div><div class="v">{{ stats.products|fa }}</div><div class="l">محصول</div></div></div>
+  <div class="stat"><div class="ic blue"><svg class="i"><use href="#i-check"/></svg></div><div><div class="v">{{ stats.available|fa }}</div><div class="l">موجود</div></div></div>
+  <div class="stat"><div class="ic purple"><svg class="i"><use href="#i-tag"/></svg></div><div><div class="v">{{ stats.categories|fa }}</div><div class="l">دسته‌بندی</div></div></div>
+  <div class="stat"><div class="ic orange"><svg class="i"><use href="#i-eye"/></svg></div><div><div class="v">{{ stats.views|money }}</div><div class="l">بازدید صفحه</div></div></div>
+</div>
+
+<div class="grid-2">
+  <div class="stack">
+    <div class="card">
+      <div class="card-head"><h2>آخرین محصولات</h2><span class="spacer"></span><a class="btn btn-ghost btn-sm" href="{% url 'panel:products' %}">همه</a></div>
+      {% if recent %}
+      <div class="table-wrap"><table class="table"><tbody>
+        {% for p in recent %}
+        <tr>
+          <td style="width:60px">{% if p.image %}<img class="thumb" src="{{ p.image.url }}" alt="">{% else %}<div class="thumb"></div>{% endif %}</td>
+          <td><b>{{ p.name }}</b><div class="muted small">{{ p.category.name|default:"بدون دسته" }}</div></td>
+          <td>{% if p.is_available %}<span class="badge badge-success">موجود</span>{% else %}<span class="badge badge-danger">ناموجود</span>{% endif %}</td>
+          <td class="actions"><a class="btn btn-ghost btn-sm" href="{% url 'panel:product_edit' p.pk %}"><svg class="i i-sm"><use href="#i-edit"/></svg></a></td>
+        </tr>
+        {% endfor %}
+      </tbody></table></div>
+      {% else %}
+      <div class="empty"><svg class="i"><use href="#i-box"/></svg><div>هنوز محصولی ثبت نکرده‌اید.</div><a class="btn" style="margin-top:12px" href="{% url 'panel:product_new' %}">ثبت اولین محصول</a></div>
+      {% endif %}
+    </div>
+    <div class="card card-body">
+      <h3 style="font-size:16px">لینک صفحه فروشگاه شما</h3>
+      <div class="copy-box"><input class="input" id="shop-url" value="{{ shop.public_url }}" readonly><button class="btn btn-soft" type="button" data-copy="shop-url"><svg class="i i-sm"><use href="#i-copy"/></svg>کپی</button></div>
+    </div>
+  </div>
+  <div class="stack">
+    <div class="sub-card{% if not shop.has_subscription %} expired{% endif %}">
+      <div class="small" style="opacity:.85">اشتراک</div>
+      {% if shop.has_subscription %}
+        <div class="big">{{ shop.days_left|fa }} روز</div>
+        <div class="small" style="opacity:.85;margin-bottom:14px">اعتبار تا {{ shop.subscription_until|jdate:"long" }}</div>
+      {% else %}
+        <div class="big">منقضی شده</div>
+        <div class="small" style="opacity:.85;margin-bottom:14px">برای نمایش فروشگاه، اشتراک بخرید.</div>
+      {% endif %}
+      <a class="btn" href="{% url 'panel:billing' %}">{% if shop.has_subscription %}تمدید{% else %}خرید اشتراک{% endif %}</a>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>شروع کار</h3></div>
+      <div class="card-body" style="padding-top:6px;padding-bottom:6px">
+        <ul class="checklist">
+          {% for label, done, url in checklist %}
+          <li class="{% if done %}done{% endif %}"><span class="tick">{% if done %}<svg class="i i-sm"><use href="#i-check"/></svg>{% endif %}</span><span>{{ label }}</span>
+            {% if not done %}<a class="btn btn-soft btn-sm" style="margin-right:auto" href="{% url url %}">انجام</a>{% endif %}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="card card-body" style="text-align:center">
+      <img src="{% url 'shop_qr' shop.slug %}" alt="QR" style="width:160px;margin:0 auto 10px;border-radius:12px">
+      <a class="btn btn-soft btn-sm" href="{% url 'panel:qr' %}">دانلود و چاپ QR</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
