@@ -3,9 +3,9 @@
 {% block actions %}<a class="btn" href="{% url 'panel:product_new' %}"><svg class="i"><use href="#i-plus"/></svg>محصول جدید</a>{% endblock %}
 {% block content %}
 {% if not shop.has_subscription %}
-<div class="alert alert-error"><svg class="i"><use href="#i-alert"/></svg><div>اشتراک شما به پایان رسیده و صفحه فروشگاه برای مشتریان نمایش داده نمی‌شود. <a href="{% url 'panel:billing' %}"><b>تمدید اشتراک</b></a></div></div>
-{% elif shop.days_left < 5 %}
-<div class="alert alert-warning"><svg class="i"><use href="#i-clock"/></svg><div>فقط {{ shop.days_left|fa }} روز از اشتراک شما باقی مانده است. <a href="{% url 'panel:billing' %}"><b>تمدید</b></a></div></div>
+<div class="alert alert-error"><svg class="i"><use href="#i-alert"/></svg><div>اعتبار فروشگاه شما به پایان رسیده و صفحه برای مشتریان نمایش داده نمی‌شود. برای تمدید با پشتیبانی تماس بگیرید.</div></div>
+{% elif shop.days_left < 7 %}
+<div class="alert alert-warning"><svg class="i"><use href="#i-clock"/></svg><div>اعتبار فروشگاه شما تا {{ shop.subscription_until|jdate:"long" }} است؛ {{ shop.days_left|fa }} روز باقی مانده. برای تمدید با پشتیبانی تماس بگیرید.</div></div>
 {% endif %}
 
 <div class="stats">
@@ -42,14 +42,15 @@
   <div class="stack">
     <div class="sub-card{% if not shop.has_subscription %} expired{% endif %}">
       <div class="small" style="opacity:.85">اشتراک</div>
+      {% if shop.subscription_started_at %}<div class="small" style="opacity:.85">فعال‌سازی: {{ shop.subscription_started_at|jdate:"long" }}</div>{% endif %}
       {% if shop.has_subscription %}
         <div class="big">{{ shop.days_left|fa }} روز</div>
         <div class="small" style="opacity:.85;margin-bottom:14px">اعتبار تا {{ shop.subscription_until|jdate:"long" }}</div>
       {% else %}
         <div class="big">منقضی شده</div>
-        <div class="small" style="opacity:.85;margin-bottom:14px">برای نمایش فروشگاه، اشتراک بخرید.</div>
+        {% if shop.subscription_until %}<div class="small" style="opacity:.85">اعتبار تا {{ shop.subscription_until|jdate:"long" }}</div>{% endif %}
+        <div class="small" style="opacity:.85;margin-bottom:14px">برای فعال‌سازی با پشتیبانی تماس بگیرید.</div>
       {% endif %}
-      <a class="btn" href="{% url 'panel:billing' %}">{% if shop.has_subscription %}تمدید{% else %}خرید اشتراک{% endif %}</a>
     </div>
     <div class="card">
       <div class="card-head"><h3>شروع کار</h3></div>

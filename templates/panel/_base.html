@@ -16,7 +16,6 @@
   <a href="{% url 'panel:qr' %}" class="{% if section == 'qr' %}active{% endif %}"><svg class="i"><use href="#i-qr"/></svg>QR کد فروشگاه</a>
   <div class="nav-label">حساب</div>
   <a href="{% url 'panel:settings' %}" class="{% if section == 'settings' %}active{% endif %}"><svg class="i"><use href="#i-settings"/></svg>اطلاعات فروشگاه</a>
-  <a href="{% url 'panel:billing' %}" class="{% if section == 'billing' %}active{% endif %}"><svg class="i"><use href="#i-card"/></svg>خرید اشتراک</a>
   <a href="{% url 'panel:password' %}" class="{% if section == 'password' %}active{% endif %}"><svg class="i"><use href="#i-key"/></svg>تغییر رمز</a>
   <a href="{{ shop.get_absolute_url }}" target="_blank"><svg class="i"><use href="#i-eye"/></svg>مشاهده صفحه فروشگاه</a>
 </nav>

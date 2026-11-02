@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 
 from ..utils import safe_next
 from ..forms import CategoryForm, LocationForm, ProductForm, QrCaptionForm, SetPasswordForm, ShopSettingsForm
-from ..models import Category, Payment, Plan, Product, Shop
+from ..models import Category, Product, Shop
 
 
 def panel_view(view):
@@ -176,27 +176,6 @@ def password(request):
         messages.success(request, "رمز عبور تغییر کرد.")
         return redirect("panel:dashboard")
     return render(request, "panel/password.html", _ctx(request, "password", form=form))
-
-
-@panel_view
-def billing(request):
-    return render(request, "panel/billing.html", _ctx(
-        request, "billing",
-        plans=Plan.objects.filter(is_active=True),
-        payments=request.shop.payments.select_related("plan")[:20],
-    ))
-
-
-@panel_view
-@require_POST
-def buy(request, plan_id):
-    from .pay import start_payment
-
-    plan = get_object_or_404(Plan, pk=plan_id, is_active=True)
-    payment = Payment.objects.create(
-        shop=request.shop, plan=plan, days=plan.days, amount=plan.price,
-    )
-    return start_payment(request, payment)
 
 
 @panel_view

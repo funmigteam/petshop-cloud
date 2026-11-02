@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from .views import auth, manage, panel, pay, public
+from .views import auth, manage, panel, public
 
 panel_urls = ([
     path("", panel.dashboard, name="dashboard"),
@@ -16,8 +16,6 @@ panel_urls = ([
     path("location/", panel.location, name="location"),
     path("qr/", panel.qr, name="qr"),
     path("password/", panel.password, name="password"),
-    path("billing/", panel.billing, name="billing"),
-    path("billing/buy/<int:plan_id>/", panel.buy, name="buy"),
     path("exit/", panel.exit_acting, name="exit"),
 ], "panel")
 
@@ -34,10 +32,6 @@ manage_urls = ([
     path("shops/<int:pk>/password/", manage.shop_password, name="shop_password"),
     path("shops/<int:pk>/enter/", manage.shop_enter, name="shop_enter"),
     path("shops/<int:pk>/location/", manage.shop_location, name="shop_location"),
-    path("plans/", manage.plans, name="plans"),
-    path("plans/<int:pk>/", manage.plans, name="plan_edit"),
-    path("plans/<int:pk>/delete/", manage.plan_delete, name="plan_delete"),
-    path("payments/", manage.payments, name="payments"),
     path("requests/", manage.join_requests, name="requests"),
     path("requests/<int:pk>/", manage.join_request_toggle, name="request_toggle"),
     path("site/", manage.site_settings, name="site"),
@@ -54,9 +48,6 @@ urlpatterns = [
     path("login/", auth.login_view, name="login"),
     path("logout/", auth.logout_view, name="logout"),
     path("p/<str:token>/", auth.magic_login, name="magic_login"),
-    path("pay/callback/", pay.callback, name="pay_callback"),
-    path("pay/mock/<str:ref>/", pay.mock_gateway, name="pay_mock"),
-    path("pay/result/<str:ref>/", pay.result, name="pay_result"),
     path("panel/", include(panel_urls)),
     path("manage/", include(manage_urls)),
 ]

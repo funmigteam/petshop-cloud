@@ -15,7 +15,7 @@
 
 ### معرفی
 
-**پت آنلاین** بستری برای ساخت کاتالوگ دیجیتال پت‌شاپ‌هاست. هر فروشگاه صفحه عمومی و QR اختصاصی خودش را دارد؛ مشتری‌ها محصولات را دسته‌بندی‌شده و بدون قیمت می‌بینند و مدیر فروشگاه از پنل ساده، محتوا و اشتراک را مدیریت می‌کند.
+**پت آنلاین** بستری برای ساخت کاتالوگ دیجیتال پت‌شاپ‌هاست. هر فروشگاه صفحه عمومی و QR اختصاصی خودش را دارد؛ مشتری‌ها محصولات را دسته‌بندی‌شده و بدون قیمت می‌بینند و مدیر فروشگاه از پنل ساده، محتوا را مدیریت می‌کند. مدیر سایت اشتراک را دستی فعال می‌کند.
 
 ### امکانات
 
@@ -23,8 +23,8 @@
 - 🧭 صفحه اصلی با جست‌وجوی فروشگاه، شهر و محصول، به‌علاوه نقشه فروشگاه‌ها
 - 🐕 مدیریت محصولات، تصاویر، دسته‌بندی‌ها، موجودی و پیشنهادهای ویژه
 - 📱 QR اختصاصی برای هر فروشگاه؛ خروجی PNG و نسخه چاپی A5
-- 🛠️ پنل مدیریت مرکزی برای فروشگاه‌ها، پلن‌ها، اشتراک‌ها، پرداخت‌ها و درخواست عضویت
-- 💳 پرداخت اشتراک با جیبیت؛ درگاه آزمایشی داخلی برای توسعه و راه‌اندازی اولیه
+- 🛠️ پنل مدیریت مرکزی برای فروشگاه‌ها و فعال‌سازی دستی اشتراک با تاریخ و مدت دلخواه
+- ⏰ یادآوری موعد تمدید برای مدیر و نمایش تاریخ فعال‌سازی و پایان در پنل فروشگاه
 - 🔐 ورود مدیر فروشگاه با رمز یا لینک پنل اختصاصی قابل ابطال
 - 🎨 رابط راست‌چین فارسی با فونت وزیرمتن و دارایی‌های محلی
 
@@ -32,7 +32,6 @@
 
 - Python 3.10 یا بالاتر
 - pip
-- کلیدهای جیبیت فقط برای پرداخت واقعی (اختیاری)
 
 ### راه‌اندازی محلی
 
@@ -78,11 +77,7 @@ python manage.py seed_demo
 | `DJANGO_DEBUG` | حالت توسعه؛ در production برابر `0` قرار دهید |
 | `DJANGO_ALLOWED_HOSTS` | نام میزبان‌ها، جداشده با کاما |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | مبدأهای HTTPS مورد اعتماد CSRF |
-| `SITE_URL` | نشانی کامل سایت؛ برای QR و بازگشت پرداخت استفاده می‌شود |
-| `JIBIT_API_KEY` و `JIBIT_SECRET_KEY` | کلیدهای درگاه جیبیت؛ بدون آن‌ها درگاه آزمایشی فعال است |
-| `JIBIT_MOCK` | فعال‌سازی صریح درگاه آزمایشی (`1` یا `0`) |
-| `JIBIT_BASE_URL` | نشانی API جیبیت (اختیاری؛ پیش‌فرض در تنظیمات پروژه) |
-| `JIBIT_TIMEOUT` | مهلت درخواست‌های API بر حسب ثانیه |
+| `SITE_URL` | نشانی کامل سایت؛ برای QR و لینک پنل اختصاصی |
 | `SERVE_FILES` | سرو فایل‌های static و media با Django؛ پشت وب‌سرور معمولاً خاموش باشد |
 | `MAP_TILE_URL` | الگوی آدرس tile نقشه؛ پیش‌فرض OpenStreetMap |
 | `MAP_TILE_ATTRIBUTION` | متن انتساب ارائه‌دهنده tile |
@@ -96,8 +91,6 @@ DJANGO_DEBUG=0
 DJANGO_ALLOWED_HOSTS=example.com,www.example.com
 DJANGO_CSRF_TRUSTED_ORIGINS=https://example.com,https://www.example.com
 SITE_URL=https://example.com
-JIBIT_API_KEY=your-api-key
-JIBIT_SECRET_KEY=your-secret-key
 ```
 
 ### انتشار در production
@@ -112,18 +105,18 @@ JIBIT_SECRET_KEY=your-secret-key
 
 3. برنامه را با یک WSGI server مانند Gunicorn اجرا و پشت Nginx یا reverse proxy مشابه قرار دهید.
 4. وب‌سرور باید `/static/` را از `staticfiles/` و `/media/` را از مسیر media سرو کند. از پشتیبان‌گیری امن دیتابیس و فایل‌های آپلودی مطمئن شوید.
-5. برای پرداخت واقعی، نشانی HTTPS سایت را در تنظیمات جیبیت و `SITE_URL` ثبت کنید.
+5. از جزئیات هر پت‌شاپ در پنل اصلی، تاریخ فعال‌سازی و تعداد روز دلخواه را دستی ثبت کنید.
 
 > پایگاه داده پیش‌فرض SQLite است و برای توسعه محلی مناسب است. برای بار کاری production، پایگاه داده و شیوه پشتیبان‌گیری متناسب با زیرساخت خود را انتخاب کنید.
 
 ### فناوری‌ها
 
-`Python` · `Django 5.2` · `SQLite` · `Pillow` · `Requests` · `Leaflet` · `OpenStreetMap`
+`Python` · `Django 5.2` · `SQLite` · `Pillow` · `Leaflet` · `OpenStreetMap`
 
 ### ساختار پروژه
 
 ```text
-core/                  مدل‌ها، فرم‌ها، سرویس پرداخت، QR و viewها
+core/                  مدل‌ها، فرم‌ها، فعال‌سازی دستی، QR و viewها
   management/commands/ دستورات setup_site و seed_demo
   views/               بخش عمومی، احراز هویت، پنل فروشگاه و مدیریت
 petshop_cloud/         تنظیمات و پیکربندی اصلی Django
@@ -138,7 +131,7 @@ media/                 فایل‌های آپلودی کاربران (محلی؛
 
 ### Overview
 
-**Pet Online** is a Persian-first platform for digital pet-shop catalogs. Each shop gets a public storefront and a unique QR code. Customers can browse categorized products without prices, while shop owners manage their catalog and subscription from a dedicated dashboard.
+**Pet Online** is a Persian-first platform for digital pet-shop catalogs. Each shop gets a public storefront and a unique QR code. Customers can browse categorized products without prices, while shop owners manage their catalog from a dedicated dashboard. Site admins activate subscriptions manually for a selected date and duration.
 
 ### Features
 
@@ -146,8 +139,8 @@ media/                 فایل‌های آپلودی کاربران (محلی؛
 - 🧭 Searchable directory by shop, city, and product, plus a shops map
 - 🐕 Product, image, category, availability, and featured-item management
 - 📱 Per-shop QR codes with PNG download and print-ready A5 page
-- 🛠️ Central admin dashboard for shops, plans, subscriptions, payments, and join requests
-- 💳 Jibit subscription payments with a built-in mock gateway for development
+- 🛠️ Central admin dashboard for shops, manual subscription activation, and join requests
+- ⏰ Expiry reminders for admins; activation and expiration dates shown in shop panels
 - 🔐 Password sign-in and revocable shop-specific panel links
 - 🎨 Persian RTL interface with locally hosted Vazirmatn fonts and assets
 
@@ -155,7 +148,6 @@ media/                 فایل‌های آپلودی کاربران (محلی؛
 
 - Python 3.10+
 - pip
-- Jibit credentials for real payments (optional)
 
 ### Local setup
 
@@ -201,11 +193,7 @@ Settings are read from environment variables. Defaults are intended for local de
 | `DJANGO_DEBUG` | Development mode; set to `0` in production |
 | `DJANGO_ALLOWED_HOSTS` | Comma-separated host names |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | Trusted HTTPS origins for CSRF |
-| `SITE_URL` | Full public URL, used for QR codes and payment callbacks |
-| `JIBIT_API_KEY`, `JIBIT_SECRET_KEY` | Jibit credentials; the mock gateway is used when credentials are absent |
-| `JIBIT_MOCK` | Explicitly enable (`1`) or disable (`0`) the mock gateway |
-| `JIBIT_BASE_URL` | Jibit API base URL (optional; project default applies) |
-| `JIBIT_TIMEOUT` | API request timeout in seconds |
+| `SITE_URL` | Full public URL, used for QR codes and shop panel links |
 | `SERVE_FILES` | Let Django serve static and media files; usually disabled behind a web server |
 | `MAP_TILE_URL` | Map tile URL template; defaults to OpenStreetMap |
 | `MAP_TILE_ATTRIBUTION` | Map tile provider attribution text |
@@ -219,8 +207,6 @@ DJANGO_DEBUG=0
 DJANGO_ALLOWED_HOSTS=example.com,www.example.com
 DJANGO_CSRF_TRUSTED_ORIGINS=https://example.com,https://www.example.com
 SITE_URL=https://example.com
-JIBIT_API_KEY=your-api-key
-JIBIT_SECRET_KEY=your-secret-key
 ```
 
 ### Production deployment
@@ -235,18 +221,18 @@ JIBIT_SECRET_KEY=your-secret-key
 
 3. Run the app with a WSGI server such as Gunicorn behind Nginx or a similar reverse proxy.
 4. Serve `/static/` from `staticfiles/` and `/media/` from the media directory. Back up the database and uploaded files securely.
-5. Use HTTPS and register the public callback URL with Jibit for real payments.
+5. In the admin panel, set each shop's activation date and subscription duration manually.
 
 > SQLite is configured by default and is convenient for local development. Choose a production database and backup strategy that fit your deployment.
 
 ### Tech stack
 
-`Python` · `Django 5.2` · `SQLite` · `Pillow` · `Requests` · `Leaflet` · `OpenStreetMap`
+`Python` · `Django 5.2` · `SQLite` · `Pillow` · `Leaflet` · `OpenStreetMap`
 
 ### Project layout
 
 ```text
-core/                  Models, forms, payment client, QR renderer, and views
+core/                  Models, forms, manual activation, QR renderer, and views
   management/commands/ setup_site and seed_demo commands
   views/               Public pages, auth, shop dashboard, and management
 petshop_cloud/         Django project settings and entry points

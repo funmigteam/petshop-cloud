@@ -13,7 +13,6 @@ def site(request):
         "JALALI_YEAR": gregorian_to_jalali(today.year, today.month, today.day)[0],
         "SITE_NAME": settings.SITE_NAME,
         "SITE_URL": settings.SITE_URL,
-        "JIBIT_MOCK": settings.JIBIT_MOCK,
         "MAP_TILE_URL": settings.MAP_TILE_URL,
         "MAP_TILE_ATTRIBUTION": settings.MAP_TILE_ATTRIBUTION,
         "MAP_DEFAULT_LAT": settings.MAP_DEFAULT_LAT,

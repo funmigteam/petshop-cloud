@@ -96,12 +96,6 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 
 LOGIN_URL = "login"
 
-JIBIT_BASE_URL = env("JIBIT_BASE_URL", "https://napi.jibit.ir/ppg/v3").rstrip("/")
-JIBIT_API_KEY = env("JIBIT_API_KEY")
-JIBIT_SECRET_KEY = env("JIBIT_SECRET_KEY")
-JIBIT_MOCK = env_bool("JIBIT_MOCK", not JIBIT_API_KEY)
-JIBIT_TIMEOUT = int(env("JIBIT_TIMEOUT", "20"))
-
 CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
 
 if not DEBUG:

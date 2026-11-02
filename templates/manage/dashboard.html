@@ -6,31 +6,10 @@
   <div class="stat"><div class="ic"><svg class="i"><use href="#i-store"/></svg></div><div><div class="v">{{ stats.shops|fa }}</div><div class="l">کل پت شاپ‌ها</div></div></div>
   <div class="stat"><div class="ic blue"><svg class="i"><use href="#i-check"/></svg></div><div><div class="v">{{ stats.active|fa }}</div><div class="l">اشتراک فعال</div></div></div>
   <div class="stat"><div class="ic orange"><svg class="i"><use href="#i-clock"/></svg></div><div><div class="v">{{ stats.expiring|fa }}</div><div class="l">انقضا در ۷ روز آینده</div></div></div>
-  <div class="stat"><div class="ic purple"><svg class="i"><use href="#i-card"/></svg></div><div><div class="v">{{ stats.revenue_month|money }}</div><div class="l">درآمد این ماه (ریال)</div></div></div>
 </div>
 <div class="grid-2">
   <div class="stack">
-    <div class="card">
-      <div class="card-head"><h2>درآمد ماهانه</h2><span class="spacer"></span><span class="muted small">مجموع کل: {{ stats.revenue_total|money }} ریال</span></div>
-      <div class="card-body">
-        {% if monthly %}
-        <div class="bars">{% for row in monthly %}<div class="bar" title="{{ row.total|money }} ریال"><em>{{ row.total|money }}</em><span class="b" style="height:{{ row.pct }}%"></span><small>{{ row.m|jmonth }}</small></div>{% endfor %}</div>
-        {% else %}<div class="empty">هنوز پرداختی انجام نشده است.</div>{% endif %}
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-head"><h2>آخرین پرداخت‌ها</h2><span class="spacer"></span><a class="btn btn-ghost btn-sm" href="{% url 'manage:payments' %}">همه</a></div>
-      {% if recent_payments %}
-      <div class="table-wrap"><table class="table"><tbody>
-        {% for p in recent_payments %}
-        <tr><td><a href="{% url 'manage:shop' p.shop_id %}"><b>{{ p.shop.name }}</b></a><div class="muted small">{{ p.plan.name|default:p.get_gateway_display }}</div></td>
-          <td>{{ p.amount|money }} <span class="muted small">ریال</span></td>
-          <td>{% if p.status == "success" %}<span class="badge badge-success">موفق</span>{% elif p.status == "failed" %}<span class="badge badge-danger">ناموفق</span>{% else %}<span class="badge badge-warning">در انتظار</span>{% endif %}</td>
-          <td class="muted small">{{ p.created_at|jdate:"time" }}</td></tr>
-        {% endfor %}
-      </tbody></table></div>
-      {% else %}<div class="empty">پرداختی ثبت نشده است.</div>{% endif %}
-    </div>
+    <div class="card"><div class="card-head"><h2>یادآوری تمدید</h2></div><div class="card-body muted">برای تمدید هر پت‌شاپ، وارد جزئیات همان فروشگاه شوید و مدت و تاریخ فعال‌سازی را دستی ثبت کنید.</div></div>
   </div>
   <div class="stack">
     <div class="card">

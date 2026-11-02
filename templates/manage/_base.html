@@ -7,9 +7,6 @@
   <a href="{% url 'manage:shops' %}" class="{% if section == 'shops' %}active{% endif %}"><svg class="i"><use href="#i-store"/></svg>پت شاپ‌ها</a>
   <a href="{% url 'manage:shop_new' %}"><svg class="i"><use href="#i-plus"/></svg>ثبت پت شاپ جدید</a>
   <a href="{% url 'manage:requests' %}" class="{% if section == 'requests' %}active{% endif %}"><svg class="i"><use href="#i-inbox"/></svg>درخواست‌های عضویت{% if pending_requests %}<span class="count">{{ pending_requests|fa }}</span>{% endif %}</a>
-  <div class="nav-label">فروش</div>
-  <a href="{% url 'manage:plans' %}" class="{% if section == 'plans' %}active{% endif %}"><svg class="i"><use href="#i-tag"/></svg>پلن‌های اشتراک</a>
-  <a href="{% url 'manage:payments' %}" class="{% if section == 'payments' %}active{% endif %}"><svg class="i"><use href="#i-card"/></svg>پرداخت‌ها</a>
   <div class="nav-label">سایت</div>
   <a href="{% url 'manage:site' %}" class="{% if section == 'site' %}active{% endif %}"><svg class="i"><use href="#i-settings"/></svg>تنظیمات صفحه اصلی</a>
   <a href="{% url 'shops_map' %}" target="_blank"><svg class="i"><use href="#i-map"/></svg>نقشه پت شاپ‌ها</a>

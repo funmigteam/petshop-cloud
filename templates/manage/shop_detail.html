@@ -49,14 +49,6 @@
         <a class="btn btn-soft btn-sm" href="{% url 'manage:shop_location' shop.pk %}"><svg class="i i-sm"><use href="#i-map"/></svg>{% if shop.has_location %}ویرایش موقعیت{% else %}ثبت روی نقشه{% endif %}</a>
       </div>
     </div>
-    <div class="card">
-      <div class="card-head"><h3>پرداخت‌ها و تمدیدها</h3></div>
-      {% if payments %}<div class="table-wrap"><table class="table">
-        <thead><tr><th>تاریخ</th><th>شرح</th><th>مبلغ (ریال)</th><th>وضعیت</th></tr></thead><tbody>
-        {% for p in payments %}<tr><td class="small">{{ p.created_at|jdate:"time" }}</td><td>{{ p.plan.name|default:p.message }} <span class="muted small">({{ p.days|fa }} روز)</span></td><td>{{ p.amount|money }}</td>
-          <td>{% if p.status == "success" %}<span class="badge badge-success">موفق</span>{% elif p.status == "failed" %}<span class="badge badge-danger">ناموفق</span>{% else %}<span class="badge badge-warning">در انتظار</span>{% endif %}</td></tr>{% endfor %}
-      </tbody></table></div>{% else %}<div class="empty small">پرداختی ندارد.</div>{% endif %}
-    </div>
   </div>
 
   <div class="stack">
@@ -65,6 +57,7 @@
       <dl class="kv">
         <dt>مالک</dt><dd class="ltr" style="text-align:right">{{ shop.owner.username }}</dd>
         <dt>اعتبار تا</dt><dd>{{ shop.subscription_until|jdate:"long" }}</dd>
+        <dt>فعال‌سازی از</dt><dd>{% if shop.subscription_started_at %}{{ shop.subscription_started_at|jdate:"long" }}{% else %}—{% endif %}</dd>
         <dt>محصولات</dt><dd>{{ product_count|fa }}</dd>
         <dt>بازدید</dt><dd>{{ shop.views|money }}</dd>
         <dt>تلفن</dt><dd class="ltr" style="text-align:right">{{ shop.phone|default:"—" }}</dd>
@@ -73,16 +66,18 @@
     </div>
     <form method="post" action="{% url 'manage:shop_extend' shop.pk %}" class="card">
       {% csrf_token %}
-      <div class="card-head"><svg class="i"><use href="#i-calendar"/></svg><h3>تمدید دستی اشتراک</h3></div>
+      <div class="card-head"><svg class="i"><use href="#i-calendar"/></svg><h3>فعال‌سازی دستی اشتراک</h3></div>
       <div class="card-body">
         <div class="row" style="gap:6px;margin-bottom:12px">
           <button type="button" class="chip" onclick="this.form.days.value=15">۱۵ روز</button>
-          <button type="button" class="chip" onclick="this.form.days.value=30">۱ ماه</button>
-          <button type="button" class="chip" onclick="this.form.days.value=90">۳ ماه</button>
-          <button type="button" class="chip" onclick="this.form.days.value=365">۱ سال</button>
+          <button type="button" class="chip" onclick="this.form.days.value=30">۳۰ روز</button>
+          <button type="button" class="chip" onclick="this.form.days.value=90">۹۰ روز</button>
+          <button type="button" class="chip" onclick="this.form.days.value=365">۳۶۵ روز</button>
         </div>
         {% include "partials/field.html" with field=extend_form.days %}
-        <button class="btn btn-block" type="submit">اعمال</button>
+        {% include "partials/field.html" with field=extend_form.start_date %}
+        <p class="muted small">تاریخ پایان خودکار از روی تاریخ فعال‌سازی و تعداد روز محاسبه و در پنل فروشگاه نمایش داده می‌شود.</p>
+        <button class="btn btn-block" type="submit">فعال‌سازی و ذخیره</button>
       </div>
     </form>
     <div class="card card-body">

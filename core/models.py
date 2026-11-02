@@ -100,6 +100,7 @@ class Shop(models.Model):
     is_active = models.BooleanField("فعال", default=True, help_text="با غیرفعال کردن، صفحه فروشگاه از دسترس خارج می‌شود.")
     is_featured = models.BooleanField("بنر ویژه در صفحه اصلی", default=False)
     subscription_until = models.DateTimeField("اعتبار اشتراک تا", null=True, blank=True)
+    subscription_started_at = models.DateTimeField("تاریخ فعال‌سازی اشتراک", null=True, blank=True)
     panel_token = models.CharField(max_length=64, unique=True, default=new_panel_token, editable=False)
     views = models.PositiveIntegerField("بازدید", default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -150,8 +151,14 @@ class Shop(models.Model):
 
     def extend(self, days):
         start = self.subscription_until if self.has_subscription else timezone.now()
+        self.subscription_started_at = start
         self.subscription_until = start + timedelta(days=days)
-        self.save(update_fields=["subscription_until"])
+        self.save(update_fields=["subscription_started_at", "subscription_until"])
+
+    def activate_for(self, days, start_at):
+        self.subscription_started_at = start_at
+        self.subscription_until = start_at + timedelta(days=days)
+        self.save(update_fields=["subscription_started_at", "subscription_until"])
 
     def regenerate_token(self):
         self.panel_token = new_panel_token()

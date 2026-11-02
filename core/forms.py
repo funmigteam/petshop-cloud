@@ -3,8 +3,9 @@ import secrets
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
+from django.utils import timezone
 
-from .models import Category, JoinRequest, Plan, Product, Shop, SiteConfig
+from .models import Category, JoinRequest, Product, Shop, SiteConfig
 
 User = get_user_model()
 
@@ -61,7 +62,7 @@ class ShopCreateForm(ShopAdminForm):
     password = forms.CharField(
         label="رمز عبور", required=False, help_text="خالی بگذارید تا رمز تصادفی ساخته شود.",
     )
-    initial_days = forms.IntegerField(label="اشتراک هدیه (روز)", min_value=0, initial=15)
+    initial_days = forms.IntegerField(label="فعال‌سازی اولیه (روز، اختیاری)", min_value=0, initial=0)
 
     field_order = ["name", "slug", "username", "password", "initial_days"]
 
@@ -114,12 +115,6 @@ class LocationForm(Styled, forms.ModelForm):
         widgets = {"lat": forms.HiddenInput(), "lng": forms.HiddenInput()}
 
 
-class PlanForm(Styled, forms.ModelForm):
-    class Meta:
-        model = Plan
-        fields = ["name", "days", "price", "description", "is_active", "is_popular", "order"]
-
-
 class SiteConfigForm(Styled, forms.ModelForm):
     class Meta:
         model = SiteConfig
@@ -133,8 +128,13 @@ class JoinRequestForm(Styled, forms.ModelForm):
 
 
 class ExtendForm(Styled, forms.Form):
-    days = forms.IntegerField(label="تعداد روز", min_value=-3650, max_value=3650, initial=30,
-                              help_text="عدد منفی از اعتبار کم می‌کند.")
+    days = forms.IntegerField(label="مدت فعال‌سازی (روز)", min_value=1, max_value=3650, initial=30)
+    start_date = forms.DateField(
+        label="تاریخ فعال‌سازی",
+        initial=timezone.localdate,
+        widget=forms.DateInput(attrs={"type": "date"}),
+        help_text="تاریخ میلادی؛ تاریخ پایان بر اساس مدت واردشده محاسبه می‌شود.",
+    )
 
 
 class SetPasswordForm(Styled, forms.Form):

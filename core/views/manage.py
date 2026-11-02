@@ -1,18 +1,17 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from functools import wraps
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Count, Q, Sum
-from django.db.models.functions import TruncMonth
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from ..utils import safe_next
-from ..forms import ExtendForm, LocationForm, PlanForm, SetPasswordForm, ShopAdminForm, ShopCreateForm, SiteConfigForm
-from ..models import JoinRequest, Payment, Plan, Product, Shop, SiteConfig
+from ..forms import ExtendForm, LocationForm, SetPasswordForm, ShopAdminForm, ShopCreateForm, SiteConfigForm
+from ..models import JoinRequest, Product, Shop, SiteConfig
 
 
 def staff_view(view):
@@ -34,18 +33,6 @@ def _ctx(section, **extra):
 def dashboard(request):
     now = timezone.now()
     shops = Shop.objects.all()
-    paid = Payment.objects.filter(status=Payment.SUCCESS)
-    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-
-    six_months_ago = (month_start - timedelta(days=150)).replace(day=1)
-    monthly = list(
-        paid.filter(paid_at__gte=six_months_ago)
-        .annotate(m=TruncMonth("paid_at")).values("m").annotate(total=Sum("amount")).order_by("m")
-    )
-    peak = max((row["total"] for row in monthly), default=0) or 1
-    for row in monthly:
-        row["pct"] = round(row["total"] * 100 / peak)
-
     return render(request, "manage/dashboard.html", _ctx(
         "dashboard",
         stats={
@@ -53,11 +40,7 @@ def dashboard(request):
             "active": shops.filter(is_active=True, subscription_until__gt=now).count(),
             "expiring": shops.filter(subscription_until__gt=now, subscription_until__lt=now + timedelta(days=7)).count(),
             "products": Product.objects.count(),
-            "revenue_month": paid.filter(paid_at__gte=month_start).aggregate(s=Sum("amount"))["s"] or 0,
-            "revenue_total": paid.aggregate(s=Sum("amount"))["s"] or 0,
         },
-        monthly=monthly,
-        recent_payments=Payment.objects.select_related("shop", "plan")[:8],
         expiring=shops.filter(subscription_until__gt=now, subscription_until__lt=now + timedelta(days=7))
         .order_by("subscription_until")[:8],
         recent_shops=shops.order_by("-created_at")[:6],
@@ -107,9 +90,8 @@ def shop_detail(request, pk):
         "shops",
         shop=shop,
         creds=creds,
-        extend_form=ExtendForm(),
+        extend_form=ExtendForm(initial={"start_date": timezone.localdate()}),
         password_form=SetPasswordForm(),
-        payments=shop.payments.select_related("plan")[:10],
         product_count=shop.products.count(),
     ))
 
@@ -145,12 +127,10 @@ def shop_extend(request, pk):
     form = ExtendForm(request.POST)
     if form.is_valid():
         days = form.cleaned_data["days"]
-        shop.extend(days)
-        Payment.objects.create(
-            shop=shop, days=days, amount=0, gateway="manual", status=Payment.SUCCESS,
-            paid_at=timezone.now(), message=f"تمدید دستی توسط {request.user.username}",
-        )
-        messages.success(request, f"اشتراک {days} روز تغییر کرد.")
+        start_date = form.cleaned_data["start_date"]
+        start_at = timezone.make_aware(datetime.combine(start_date, datetime.min.time()))
+        shop.activate_for(days, start_at)
+        messages.success(request, f"اشتراک از {start_date:%Y-%m-%d} به‌مدت {days} روز فعال شد.")
     else:
         messages.error(request, "تعداد روز نامعتبر است.")
     return redirect("manage:shop", pk=pk)
@@ -206,44 +186,6 @@ def shop_location(request, pk):
         messages.success(request, "موقعیت مکانی فروشگاه ذخیره شد.")
         return redirect("manage:shop", pk=pk)
     return render(request, "manage/shop_location.html", _ctx("shops", shop=shop, form=form))
-
-
-@staff_view
-def plans(request, pk=None):
-    editing = get_object_or_404(Plan, pk=pk) if pk else None
-    form = PlanForm(request.POST or None, instance=editing)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "پلن ذخیره شد.")
-        return redirect("manage:plans")
-    return render(request, "manage/plans.html", _ctx(
-        "plans", form=form, editing=editing,
-        plans=Plan.objects.annotate(sold=Count("payment", filter=Q(payment__status=Payment.SUCCESS))),
-    ))
-
-
-@staff_view
-@require_POST
-def plan_delete(request, pk):
-    get_object_or_404(Plan, pk=pk).delete()
-    messages.success(request, "پلن حذف شد.")
-    return redirect("manage:plans")
-
-
-@staff_view
-def payments(request):
-    qs = Payment.objects.select_related("shop", "plan")
-    status = request.GET.get("status", "")
-    if status in dict(Payment.STATUS_CHOICES):
-        qs = qs.filter(status=status)
-    q = request.GET.get("q", "").strip()
-    if q:
-        qs = qs.filter(Q(shop__name__icontains=q) | Q(purchase_id__icontains=q) | Q(reference__icontains=q))
-    total = qs.filter(status=Payment.SUCCESS).aggregate(s=Sum("amount"))["s"] or 0
-    page = Paginator(qs, 30).get_page(request.GET.get("page"))
-    return render(request, "manage/payments.html", _ctx(
-        "payments", page=page, status=status, q=q, total=total, statuses=Payment.STATUS_CHOICES,
-    ))
 
 
 @staff_view
